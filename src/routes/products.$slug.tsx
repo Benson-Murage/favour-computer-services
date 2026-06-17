@@ -20,12 +20,14 @@ const productOpts = (slug: string) =>
         .eq("slug", slug)
         .maybeSingle();
       if (!data) throw notFound();
-      const related = await supabase
-        .from("products")
-        .select("id,slug,name,price,compare_at_price,image_url,rating,review_count,condition,brand:brands(name)")
-        .eq("category_id", data.category_id)
-        .neq("id", data.id)
-        .limit(4);
+      const related = data.category_id
+        ? await supabase
+            .from("products")
+            .select("id,slug,name,price,compare_at_price,image_url,rating,review_count,condition,brand:brands(name)")
+            .eq("category_id", data.category_id)
+            .neq("id", data.id)
+            .limit(4)
+        : { data: [] as ProductCardData[] };
       return { product: data, related: (related.data ?? []) as unknown as ProductCardData[] };
     },
   });
