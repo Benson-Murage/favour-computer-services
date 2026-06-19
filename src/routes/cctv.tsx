@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Camera, ShieldCheck, Moon, Activity, Smartphone, Cloud, ArrowRight, MessageCircle, Phone } from "lucide-react";
+import { QuoteForm } from "@/components/quote-form";
 
 export const Route = createFileRoute("/cctv")({
   head: () => ({
@@ -104,5 +105,3 @@ function CctvPage() {
     </div>
   );
 }
-
-import { QuoteForm } from "@/components/quote-form";
