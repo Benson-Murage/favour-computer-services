@@ -84,10 +84,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
       { name: "description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
-      { property: "og:title", content: "Favour Computer Services — Nairobi" },
-      { property: "og:description", content: "Computers, CCTV installation and live streaming services in Nairobi, Kenya." },
+      { property: "og:title", content: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
+      { property: "og:description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
+      { name: "twitter:description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9b7a86aa-6fb1-4a9e-8345-94ec87503610/id-preview-f401d527--bcb2bc46-96c9-483f-bb89-ce1696c4b248.lovable.app-1781862440193.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9b7a86aa-6fb1-4a9e-8345-94ec87503610/id-preview-f401d527--bcb2bc46-96c9-483f-bb89-ce1696c4b248.lovable.app-1781862440193.png" },
     ],
     links: [
       {
