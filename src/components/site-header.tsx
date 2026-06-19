@@ -1,17 +1,20 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Heart, Search, ShoppingBag, User, Zap, Menu, X } from "lucide-react";
+import { Heart, Search, ShoppingBag, User, Cpu, Menu, X, Phone, MapPin } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { label: "Shop", to: "/shop", search: {} as Record<string, string> },
+type NavItem = { label: string; to: string; search?: Record<string, string> };
+const NAV: NavItem[] = [
+  { label: "Shop", to: "/shop" },
   { label: "Laptops", to: "/shop", search: { category: "laptops" } },
   { label: "Desktops", to: "/shop", search: { category: "desktops" } },
   { label: "Phones", to: "/shop", search: { category: "phones" } },
-  { label: "Components", to: "/shop", search: { category: "storage" } },
-  { label: "Accessories", to: "/shop", search: { category: "accessories" } },
   { label: "Refurbished", to: "/shop", search: { condition: "refurb" } },
+  { label: "CCTV", to: "/cctv" },
+  { label: "Live Streaming", to: "/live-streaming" },
+  { label: "About", to: "/about" },
+  { label: "Contact", to: "/contact" },
 ];
 
 export function SiteHeader() {
@@ -39,18 +42,31 @@ export function SiteHeader() {
       )}
     >
       <div className="border-b border-border/60 bg-foreground text-background">
-        <div className="mx-auto flex h-8 max-w-7xl items-center justify-center gap-2 px-4 text-[11px] font-medium tracking-wide">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent)]" />
-          Free 2-day shipping on orders over $99 · Certified refurbished with 1-year warranty
+        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between gap-3 px-4 text-[11px] font-medium tracking-wide">
+          <span className="hidden items-center gap-1.5 sm:inline-flex">
+            <MapPin className="h-3.5 w-3.5 text-[color:var(--accent)]" />
+            F&amp;F Building, Shop U13 · Next to Odeon Cinema, Nairobi
+          </span>
+          <span className="flex items-center gap-3">
+            <a href="tel:+254726548592" className="inline-flex items-center gap-1.5 hover:text-[color:var(--accent)]">
+              <Phone className="h-3.5 w-3.5" /> 0726 548 592
+            </a>
+            <a href="https://wa.me/254726548592" target="_blank" rel="noreferrer" className="hidden sm:inline hover:text-[color:var(--accent)]">
+              WhatsApp
+            </a>
+          </span>
         </div>
       </div>
 
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-foreground text-background">
-            <Zap className="h-5 w-5" strokeWidth={2.5} />
+            <Cpu className="h-5 w-5" strokeWidth={2.5} />
           </span>
-          <span className="text-lg font-bold tracking-tight">Voltline</span>
+          <span className="flex flex-col leading-none">
+            <span className="text-base font-bold tracking-tight">Favour Computer</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Services · Nairobi</span>
+          </span>
         </Link>
 
         <form
@@ -65,7 +81,7 @@ export function SiteHeader() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search laptops, phones, components…"
+              placeholder="Search laptops, CCTV, accessories…"
               className="h-10 w-full rounded-full border border-border bg-secondary pl-10 pr-4 text-sm outline-none ring-ring/30 transition focus:bg-background focus:ring-2"
             />
           </div>
