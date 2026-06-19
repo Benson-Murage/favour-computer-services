@@ -4,6 +4,7 @@ import {
   ArrowRight, Laptop, Monitor, Smartphone, Tablet, HardDrive, MemoryStick,
   MonitorSmartphone, Printer, Wifi, Gamepad2, Headphones, RefreshCw,
   ShieldCheck, Truck, BadgeCheck, CreditCard, Wrench, Sparkles, Star,
+  Camera, Video, Store, MapPin, Phone, MessageCircle, ShoppingBag,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/product-card";
@@ -40,10 +41,10 @@ const homeData = queryOptions({
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voltline — Premium Electronics, New & Certified Refurbished" },
-      { name: "description", content: "Shop laptops, phones, components and accessories — new and certified-refurbished with warranty." },
-      { property: "og:title", content: "Voltline — Premium Electronics" },
-      { property: "og:description", content: "New & certified-refurbished tech with warranty and fast shipping." },
+      { title: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
+      { name: "description", content: "Premium laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. Order online or pick up at F&F Building, Shop U13." },
+      { property: "og:title", content: "Favour Computer Services — Nairobi" },
+      { property: "og:description", content: "Computers, CCTV installation and live streaming in Nairobi, Kenya." },
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
@@ -65,32 +66,31 @@ function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 text-background md:grid-cols-2 md:py-28">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-background/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" /> New season drops
+              <Sparkles className="h-3.5 w-3.5" /> Trusted in Nairobi since day one
             </span>
             <h1 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
-              The tech you want.<br />
-              <span className="text-[color:var(--accent)]">New or certified refurbished.</span>
+              Your Trusted Technology<br />
+              Partner in <span className="text-[color:var(--accent)]">Nairobi.</span>
             </h1>
             <p className="mt-5 max-w-lg text-base text-background/75 md:text-lg">
-              Save up to 60% on inspected, warrantied devices — or shop the latest releases at the right
-              price. Free 2-day shipping over $99.
+              Premium laptops, computers, CCTV solutions, live streaming services and genuine tech
+              accessories — new and refurbished. Order online or pick up at our shop.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/shop" className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground transition hover:scale-[1.02]">
-                Shop now <ArrowRight className="h-4 w-4" />
+                Shop Products <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/shop"
-                search={{ condition: "refurb" }}
+                to="/contact"
                 className="inline-flex h-12 items-center gap-2 rounded-full border border-background/30 bg-background/5 px-6 text-sm font-semibold text-background backdrop-blur transition hover:bg-background/15"
               >
-                See refurbished deals
+                Get a Quote
               </Link>
             </div>
             <div className="mt-10 grid max-w-md grid-cols-3 gap-4 text-sm">
-              <Stat n="120k+" l="Customers" />
-              <Stat n="4.9★" l="Rated service" />
-              <Stat n="1-yr" l="Refurb warranty" />
+              <Stat n="500+" l="Devices in stock" />
+              <Stat n="4.9★" l="Customer rated" />
+              <Stat n="Shop U13" l="F&F Building" />
             </div>
           </div>
           <div className="relative hidden md:block">
@@ -116,12 +116,22 @@ function Home() {
       {/* TRUST STRIP */}
       <section className="border-b border-border bg-secondary/40">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 text-sm md:grid-cols-4">
-          <Trust Icon={Truck} t="Free 2-day shipping" s="On orders $99+" />
-          <Trust Icon={ShieldCheck} t="1-yr warranty" s="On every refurb" />
-          <Trust Icon={BadgeCheck} t="Genuine products" s="Authorized only" />
-          <Trust Icon={CreditCard} t="Secure checkout" s="256-bit encryption" />
+          <Trust Icon={BadgeCheck} t="Genuine products" s="Sourced from trusted suppliers" />
+          <Trust Icon={ShieldCheck} t="Warranty support" s="On new and refurbished devices" />
+          <Trust Icon={Truck} t="Fast delivery in Nairobi" s="Countrywide shipping available" />
+          <Trust Icon={Store} t="Store pickup" s="F&F Building, Shop U13" />
         </div>
       </section>
+
+      {/* SERVICES */}
+      <Section title="Our services" subtitle="One technology partner for your devices, security, and events.">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <ServiceCard Icon={ShoppingBag} title="Electronics Sales" desc="Premium new and refurbished laptops, desktops, phones and components." to="/shop" cta="Shop now" />
+          <ServiceCard Icon={Camera} title="CCTV Installation" desc="Professional surveillance for homes, offices, schools and businesses." to="/cctv" cta="Explore CCTV" />
+          <ServiceCard Icon={Video} title="Live Streaming" desc="Multi-camera streaming for church, conferences, weddings and events." to="/live-streaming" cta="Book streaming" />
+          <ServiceCard Icon={Wrench} title="Technical Support" desc="Consultation, repairs and ongoing IT support for individuals and teams." to="/contact" cta="Talk to us" />
+        </div>
+      </Section>
 
       {/* CATEGORIES */}
       <Section title="Shop by category" subtitle="Everything from ultralight laptops to enterprise networking.">
@@ -202,16 +212,73 @@ function Home() {
       </section>
 
       {/* WHY US */}
-      <Section title="Why Voltline" subtitle="A retailer built around trust, speed, and after-sale care.">
+      <Section title="Why Favour Computer Services" subtitle="A Nairobi technology partner built on trust, quality, and after-sale care.">
         <div className="grid gap-4 md:grid-cols-3">
           <Feature Icon={BadgeCheck} t="100% Genuine" s="Sourced from authorized distributors and brand partners only." />
-          <Feature Icon={Wrench} t="Tested Refurbs" s="41-point inspection, deep clean, and software wipe before relisting." />
-          <Feature Icon={ShieldCheck} t="Warranty included" s="1-year coverage on refurbs. Manufacturer warranty on new." />
-          <Feature Icon={Truck} t="Fast shipping" s="Free 2-day shipping over $99. Same-day in select metros." />
-          <Feature Icon={CreditCard} t="Secure payments" s="Encrypted checkout. Multiple payment options." />
-          <Feature Icon={Headphones} t="Real support" s="Talk to a human via chat, email, or phone — 7 days a week." />
+          <Feature Icon={Wrench} t="Tested Refurbs" s="Inspected, cleaned, and software-wiped before relisting." />
+          <Feature Icon={ShieldCheck} t="Warranty included" s="Coverage on refurbs. Manufacturer warranty on new devices." />
+          <Feature Icon={Truck} t="Fast delivery" s="Same-day across Nairobi. Countrywide shipping available." />
+          <Feature Icon={Store} t="Store pickup" s="Reserve online and collect at F&F Building, Shop U13." />
+          <Feature Icon={Headphones} t="Real support" s="Talk to a human via call or WhatsApp on 0726 548 592." />
         </div>
       </Section>
+
+      {/* STORE PICKUP */}
+      <section className="mx-auto mt-20 max-w-7xl px-4">
+        <div className="grid items-center gap-8 overflow-hidden rounded-3xl border border-border bg-secondary p-8 md:grid-cols-2 md:p-12">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-foreground px-3 py-1 text-xs font-semibold uppercase tracking-widest text-background">
+              <Store className="h-3.5 w-3.5" /> Store pickup available
+            </span>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">Prefer picking up your order?</h2>
+            <p className="mt-3 max-w-lg text-muted-foreground">
+              Reserve products online and collect them directly from our Nairobi store at
+              <span className="font-semibold text-foreground"> F&amp;F Building, Shop U13</span>, next to Odeon Cinema.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=F%26F+Building+Odeon+Nairobi"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-semibold text-background"
+              >
+                <MapPin className="h-4 w-4" /> Get directions
+              </a>
+              <a href="tel:+254726548592" className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-background px-5 text-sm font-semibold">
+                <Phone className="h-4 w-4" /> 0726 548 592
+              </a>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <PickupTile t="Address" s="F&F Building, Shop U13, Nairobi" />
+            <PickupTile t="Landmark" s="Next to Odeon Cinema" />
+            <PickupTile t="Phone" s="0726 548 592" />
+            <PickupTile t="WhatsApp" s="wa.me/254726548592" />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mx-auto mt-20 max-w-7xl px-4">
+        <div className="overflow-hidden rounded-3xl bg-foreground p-10 text-background md:p-14">
+          <div className="grid items-center gap-6 md:grid-cols-[1fr_auto]">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Need help choosing the right device?</h2>
+              <p className="mt-2 max-w-xl text-background/70">
+                Our team helps you pick the right laptop, build a CCTV system, or plan a live stream.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <a href="tel:+254726548592" className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground">
+                <Phone className="h-4 w-4" /> Call 0726 548 592
+              </a>
+              <a href="https://wa.me/254726548592" target="_blank" rel="noreferrer" className="inline-flex h-12 items-center gap-2 rounded-full bg-[color:var(--accent)] px-6 text-sm font-semibold text-accent-foreground">
+                <MessageCircle className="h-4 w-4" /> WhatsApp us
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* TESTIMONIALS */}
       <Section title="Loved by 120,000+ customers">
@@ -317,6 +384,30 @@ function RefurbStep({ n, t }: { n: string; t: string }) {
     <div className="rounded-xl bg-background/5 px-3 py-2 ring-1 ring-background/10">
       <div className="text-[10px] font-bold text-[color:var(--accent)]">{n}</div>
       <div className="text-sm font-semibold">{t}</div>
+    </div>
+  );
+}
+
+function ServiceCard({ Icon, title, desc, to, cta }: { Icon: React.ComponentType<{ className?: string }>; title: string; desc: string; to: string; cta: string }) {
+  return (
+    <Link to={to} className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:-translate-y-0.5 hover:[box-shadow:var(--shadow-card)]">
+      <span className="grid h-11 w-11 place-items-center rounded-xl bg-foreground text-background">
+        <Icon className="h-5 w-5" />
+      </span>
+      <h3 className="mt-4 text-base font-semibold">{title}</h3>
+      <p className="mt-1 flex-1 text-sm text-muted-foreground">{desc}</p>
+      <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-foreground group-hover:text-[color:var(--accent)]">
+        {cta} <ArrowRight className="h-4 w-4" />
+      </span>
+    </Link>
+  );
+}
+
+function PickupTile({ t, s }: { t: string; s: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-background p-4">
+      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t}</div>
+      <div className="mt-1 text-sm font-semibold text-foreground">{s}</div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 export const formatPrice = (n: number | string) =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("en-KE", {
     style: "currency",
-    currency: "USD",
+    currency: "KES",
     maximumFractionDigits: 0,
   }).format(typeof n === "string" ? parseFloat(n) : n);
 
