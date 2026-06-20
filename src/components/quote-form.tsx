@@ -51,6 +51,7 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
       await submit({ data: {
         source, name: parsed.data.name, email: parsed.data.email, phone: parsed.data.phone,
         service_type: parsed.data.service, message: parsed.data.message,
+        package: "", location: "",
       } });
       setSent(true);
       toast.success("Message received — we'll respond within 1 business day.");
