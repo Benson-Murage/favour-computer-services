@@ -85,10 +85,10 @@ function ProductsPage() {
                 </td>
                 <td className="p-3">
                   <div className="flex flex-wrap gap-1">
-                    {ap.is_featured && <StatusPill tone="info">Featured</StatusPill>}
-                    {ap.is_new_arrival && <StatusPill tone="info">New</StatusPill>}
-                    {ap.is_best_seller && <StatusPill tone="success">Best</StatusPill>}
-                    {ap.is_on_offer && <StatusPill tone="warn">Offer</StatusPill>}
+                    {ap.is_featured ? <StatusPill tone="info">Featured</StatusPill> : null}
+                    {ap.is_new_arrival ? <StatusPill tone="info">New</StatusPill> : null}
+                    {ap.is_best_seller ? <StatusPill tone="success">Best</StatusPill> : null}
+                    {ap.is_on_offer ? <StatusPill tone="warn">Offer</StatusPill> : null}
                   </div>
                 </td>
                 <td className="p-3">
@@ -118,7 +118,7 @@ function ProductsPage() {
           brands={(brands.data ?? []) as Array<{ id: string; name: string }>}
           onSave={async (payload) => {
             try {
-              await save({ data: payload });
+              await save({ data: payload as Parameters<typeof save>[0]["data"] });
               toast.success("Saved");
               setEdit(null); setCreating(false);
               qc.invalidateQueries({ queryKey: ["adm","products"] });
