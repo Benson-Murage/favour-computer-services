@@ -13,6 +13,7 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as LiveStreamingRouteImport } from './routes/live-streaming'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CctvRouteImport } from './routes/cctv'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -54,6 +55,11 @@ const LiveStreamingRoute = LiveStreamingRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CctvRoute = CctvRouteImport.update({
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/cctv': typeof CctvRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/live-streaming': typeof LiveStreamingRoute
   '/shop': typeof ShopRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/cctv': typeof CctvRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/live-streaming': typeof LiveStreamingRoute
   '/shop': typeof ShopRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/cctv': typeof CctvRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/live-streaming': typeof LiveStreamingRoute
   '/shop': typeof ShopRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/cctv'
+    | '/checkout'
     | '/contact'
     | '/live-streaming'
     | '/shop'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/cctv'
+    | '/checkout'
     | '/contact'
     | '/live-streaming'
     | '/shop'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/cctv'
+    | '/checkout'
     | '/contact'
     | '/live-streaming'
     | '/shop'
@@ -351,6 +363,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CctvRoute: typeof CctvRoute
+  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   LiveStreamingRoute: typeof LiveStreamingRoute
   ShopRoute: typeof ShopRoute
@@ -386,6 +399,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cctv': {
@@ -602,6 +622,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CctvRoute: CctvRoute,
+  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   LiveStreamingRoute: LiveStreamingRoute,
   ShopRoute: ShopRoute,

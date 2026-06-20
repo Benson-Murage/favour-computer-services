@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
@@ -11,9 +11,8 @@ export const Route = createFileRoute("/cart")({
 
 function Cart() {
   const { items, setQty, remove, subtotal, count } = useCart();
-  const shipping = subtotal > 99 || subtotal === 0 ? 0 : 9.99;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const total = subtotal;
+  const nav = useNavigate();
 
   if (items.length === 0) {
     return (
@@ -70,14 +69,13 @@ function Cart() {
         <aside className="h-fit space-y-4 rounded-2xl border border-border bg-card p-6 [box-shadow:var(--shadow-card)]">
           <h2 className="text-lg font-bold">Order summary</h2>
           <Row k="Subtotal" v={formatPrice(subtotal)} />
-          <Row k="Shipping" v={shipping === 0 ? "Free" : formatPrice(shipping)} />
-          <Row k="Estimated tax" v={formatPrice(tax)} />
+          <Row k="Shipping" v="Calculated at checkout" />
           <div className="my-2 h-px bg-border" />
           <Row k="Total" v={formatPrice(total)} bold />
-          <button className="mt-2 w-full rounded-full bg-foreground py-3 text-sm font-semibold text-background transition hover:opacity-90">
+          <button onClick={()=>nav({ to: "/checkout" })} className="mt-2 w-full rounded-full bg-foreground py-3 text-sm font-semibold text-background transition hover:opacity-90">
             Proceed to checkout
           </button>
-          <p className="text-center text-xs text-muted-foreground">Secure 256-bit encrypted checkout</p>
+          <p className="text-center text-xs text-muted-foreground">Delivery or in-store pickup · Nairobi</p>
         </aside>
       </div>
     </div>
