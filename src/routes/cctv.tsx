@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Camera, ShieldCheck, Moon, Activity, Smartphone, Cloud, ArrowRight, MessageCircle, Phone } from "lucide-react";
-import { QuoteForm } from "@/components/quote-form";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Camera, ShieldCheck, Moon, Activity, Smartphone, Cloud, ArrowRight, MessageCircle, Phone, Check } from "lucide-react";
+import { useState } from "react";
+import { QuoteModal } from "@/components/quote-modal";
+import { getPublicServicePackages } from "@/lib/services-public.functions";
 
 export const Route = createFileRoute("/cctv")({
   head: () => ({
@@ -16,13 +20,6 @@ export const Route = createFileRoute("/cctv")({
   component: CctvPage,
 });
 
-const PACKAGES = [
-  { name: "Home Package", cams: "2 – 4 cameras", best: "Apartments & residential homes", from: "From KSh 18,000" },
-  { name: "Small Business", cams: "4 – 8 cameras", best: "Shops, offices and salons", from: "From KSh 38,000" },
-  { name: "School Package", cams: "8 – 16 cameras", best: "Schools and learning institutions", from: "From KSh 85,000" },
-  { name: "Enterprise", cams: "16+ cameras", best: "Warehouses, estates, large premises", from: "Custom quote" },
-];
-
 const FEATURES = [
   { Icon: Camera, t: "HD & 4K Cameras", s: "Crisp footage day and night." },
   { Icon: Moon, t: "Night Vision", s: "Infrared cameras for low-light." },
@@ -33,6 +30,10 @@ const FEATURES = [
 ];
 
 function CctvPage() {
+  const fn = useServerFn(getPublicServicePackages);
+  const { data } = useQuery({ queryKey: ["pub","pkg","cctv"], queryFn: () => fn({ data: "cctv" }) });
+  const [quote, setQuote] = useState<{ pkg: string } | null>(null);
+  const packages = (data ?? []) as Array<{ id: string; name: string; tagline: string | null; price_label: string | null; description: string | null; features: string[] | null }>;
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -50,7 +51,7 @@ function CctvPage() {
               Nairobi and Kenya — with mobile app access and remote monitoring.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#quote" className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground">Request a quote <ArrowRight className="h-4 w-4" /></a>
+              <button onClick={()=>setQuote({ pkg: "" })} className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground">Request a quote <ArrowRight className="h-4 w-4" /></button>
               <a href="https://wa.me/254726548592" target="_blank" rel="noreferrer" className="inline-flex h-12 items-center gap-2 rounded-full bg-[color:var(--accent)] px-6 text-sm font-semibold text-accent-foreground">
                 <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
               </a>
@@ -63,15 +64,25 @@ function CctvPage() {
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">CCTV Packages</h2>
         <p className="mt-2 text-sm text-muted-foreground">Right-sized solutions for every space. All packages include installation and setup.</p>
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {PACKAGES.map((p) => (
-            <div key={p.name} className="rounded-2xl border border-border bg-card p-6 [box-shadow:var(--shadow-card)]">
+          {packages.map((p) => (
+            <div key={p.id} className="flex flex-col rounded-2xl border border-border bg-card p-6 [box-shadow:var(--shadow-card)]">
               <h3 className="text-lg font-semibold">{p.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{p.best}</p>
-              <div className="mt-4 text-sm font-semibold text-foreground">{p.cams}</div>
-              <div className="mt-1 text-[color:var(--accent)] font-bold">{p.from}</div>
-              <a href="#quote" className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background">Request quote</a>
+              {p.tagline && <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>}
+              {p.price_label && <div className="mt-3 text-[color:var(--accent)] font-bold">{p.price_label}</div>}
+              {p.description && <p className="mt-3 text-xs text-muted-foreground">{p.description}</p>}
+              {(p.features ?? []).length > 0 && (
+                <ul className="mt-4 space-y-1.5 text-xs">
+                  {(p.features ?? []).slice(0,6).map((f) => (
+                    <li key={f} className="flex gap-1.5"><Check className="h-3.5 w-3.5 shrink-0 text-[color:var(--accent)]" /> {f}</li>
+                  ))}
+                </ul>
+              )}
+              <button onClick={()=>setQuote({ pkg: p.name })} className="mt-auto pt-5">
+                <span className="inline-flex h-10 w-full items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background">Request quote</span>
+              </button>
             </div>
           ))}
+          {packages.length === 0 && <div className="col-span-full text-sm text-muted-foreground">Loading packages…</div>}
         </div>
       </section>
 
@@ -88,20 +99,26 @@ function CctvPage() {
         </div>
       </section>
 
-      <section id="quote" className="mx-auto max-w-3xl px-4 py-16">
-        <div className="rounded-3xl border border-border bg-secondary p-8 md:p-10">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Get a CCTV quote</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Tell us about your space and we'll get back with a tailored proposal.</p>
-          <QuoteForm defaultService="CCTV Installation" />
-        </div>
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          Prefer to call? <a href="tel:+254726548592" className="font-semibold text-foreground"><Phone className="inline h-3.5 w-3.5" /> 0726 548 592</a>
+      <section className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <h2 className="text-2xl font-bold">Ready to get started?</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Request a tailored CCTV quote — no obligation.</p>
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
+          <button onClick={()=>setQuote({ pkg: "" })} className="inline-flex h-11 items-center rounded-full bg-foreground px-6 text-sm font-semibold text-background">Request CCTV quote</button>
+          <a href="tel:+254726548592" className="inline-flex h-11 items-center gap-2 rounded-full border border-border px-6 text-sm font-semibold"><Phone className="h-4 w-4" /> 0726 548 592</a>
         </div>
       </section>
 
       <div className="mx-auto max-w-7xl px-4 pb-16 text-center">
         <Link to="/live-streaming" className="text-sm font-semibold text-foreground hover:underline">Also explore our Live Streaming services →</Link>
       </div>
+
+      <QuoteModal
+        open={!!quote}
+        onClose={() => setQuote(null)}
+        source="cctv"
+        packageName={quote?.pkg}
+        title={quote?.pkg ? `Request quote — ${quote.pkg}` : "Request CCTV quote"}
+      />
     </div>
   );
 }
