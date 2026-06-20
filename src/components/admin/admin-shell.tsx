@@ -3,7 +3,8 @@ import { LayoutDashboard, Package, Tags, Building2, Boxes, MessageSquare, Calend
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const NAV = [
+type NavEntry = { to: string; label: string; Icon: typeof LayoutDashboard; exact?: boolean };
+const NAV: NavEntry[] = [
   { to: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Products", Icon: Package },
   { to: "/admin/categories", label: "Categories", Icon: Tags },
