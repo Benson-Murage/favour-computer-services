@@ -43,7 +43,7 @@ function CategoriesPage() {
         </table>
       </Card>
       <Modal open={open} onClose={()=>setOpen(false)} title={edit ? "Edit category" : "New category"}>
-        <CatForm initial={edit} onSave={async (p)=>{ try{ await save({ data: p }); toast.success("Saved"); setOpen(false); qc.invalidateQueries({ queryKey: ["adm","cats"] }); } catch(e){ toast.error((e as Error).message); } }} />
+        <CatForm initial={edit} onSave={async (p)=>{ try{ await save({ data: p as never }); toast.success("Saved"); setOpen(false); qc.invalidateQueries({ queryKey: ["adm","cats"] }); } catch(e){ toast.error((e as Error).message); } }} />
       </Modal>
     </AdminShell>
   );

@@ -51,7 +51,7 @@ function PromotionsPage() {
       </Card>
       <Modal open={open} onClose={()=>setOpen(false)} title={edit ? "Edit promotion" : "New promotion"}>
         <PromoForm initial={edit} products={(products.data ?? []) as Array<{ id: string; name: string }>}
-          onSave={async (p) => { try{ await save({ data: p }); toast.success("Saved"); setOpen(false); qc.invalidateQueries({ queryKey: ["adm","promos"] }); } catch(e){ toast.error((e as Error).message); } }} />
+          onSave={async (p) => { try{ await save({ data: p as never }); toast.success("Saved"); setOpen(false); qc.invalidateQueries({ queryKey: ["adm","promos"] }); } catch(e){ toast.error((e as Error).message); } }} />
       </Modal>
     </AdminShell>
   );

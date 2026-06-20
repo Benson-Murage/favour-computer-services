@@ -35,7 +35,7 @@ function PickupsPage() {
                 <td className="p-3">
                   <div className="flex flex-wrap gap-1 justify-end">
                     <Btn variant="primary" onClick={()=>change(o.id, "ready")}>Mark Ready</Btn>
-                    <Btn variant="success" as never onClick={()=>change(o.id, "picked_up")}>Picked up</Btn>
+                    <Btn variant="secondary" onClick={()=>change(o.id, "picked_up")}>Picked up</Btn>
                     <Btn variant="danger" onClick={()=>change(o.id, "cancelled")}>Cancel</Btn>
                   </div>
                 </td>

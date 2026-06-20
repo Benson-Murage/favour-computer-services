@@ -25,7 +25,7 @@ function OrdersPage() {
             <tr><th className="p-3">Date</th><th className="p-3">Customer</th><th className="p-3">Method</th><th className="p-3">Total</th><th className="p-3">Status</th><th className="p-3"></th></tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {((data ?? []) as Order[]).map((o) => (
+            {((data ?? []) as unknown as Order[]).map((o) => (
               <tr key={o.id}>
                 <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
                 <td className="p-3"><div className="font-semibold">{o.customer_name}</div><div className="text-xs text-muted-foreground">{o.customer_phone}</div></td>

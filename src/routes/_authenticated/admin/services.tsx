@@ -31,7 +31,7 @@ function ServicesPage() {
       <div className="h-6" />
       <PkgTable title="Live Streaming Packages" pkgs={live} onEdit={(p)=>{setEdit(p); setOpen(true);}} onDelete={async(p)=>{ if(confirm("Delete?")){ await del({data:{id:p.id}}); toast.success("Deleted"); qc.invalidateQueries({queryKey:["adm","pkgs"]}); } }} />
       <Modal open={open} onClose={()=>setOpen(false)} title={edit ? `Edit · ${edit.name}` : "New package"}>
-        <PkgForm initial={edit} onSave={async (p)=>{ try{ await save({ data: p }); toast.success("Saved"); setOpen(false); qc.invalidateQueries({ queryKey: ["adm","pkgs"] }); } catch(e){ toast.error((e as Error).message); } }} />
+        <PkgForm initial={edit} onSave={async (p)=>{ try{ await save({ data: p as never }); toast.success("Saved"); setOpen(false); qc.invalidateQueries({ queryKey: ["adm","pkgs"] }); } catch(e){ toast.error((e as Error).message); } }} />
       </Modal>
     </AdminShell>
   );
