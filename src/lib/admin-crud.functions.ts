@@ -324,13 +324,13 @@ export const savePromotion = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     if (data.id) {
       const { id, ...rest } = data;
-      const { error } = await context.supabase.from("promotions").update(rest).eq("id", id);
+      const { error } = await context.supabase.from("promotions").update(rest as never).eq("id", id);
       if (error) throw new Error(error.message);
       return { id };
     }
     const { id: _omit, ...insertData } = data;
     void _omit;
-    const { data: row, error } = await context.supabase.from("promotions").insert(insertData).select("id").single();
+    const { data: row, error } = await context.supabase.from("promotions").insert(insertData as never).select("id").single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
