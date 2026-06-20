@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useServerFn } from "@tanstack/react-start";
+import { submitQuote } from "@/lib/quotes.functions";
 
 const SERVICES = [
   "Product Inquiry",
@@ -20,13 +22,13 @@ const schema = z.object({
   message: z.string().trim().min(5, "Tell us a bit more").max(1500),
 });
 
-const EMAIL = "bensonmurage254@gmail.com";
-
 export function QuoteForm({ defaultService }: { defaultService?: string }) {
   const [service, setService] = useState(defaultService ?? "");
   const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+  const submit = useServerFn(submitQuote);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const data = {
@@ -42,17 +44,36 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
       return;
     }
     setSubmitting(true);
-    const subject = encodeURIComponent(`[${parsed.data.service}] Inquiry from ${parsed.data.name}`);
-    const body = encodeURIComponent(
-      `Name: ${parsed.data.name}\nEmail: ${parsed.data.email}\nPhone: ${parsed.data.phone}\nService: ${parsed.data.service}\n\n${parsed.data.message}`,
-    );
-    // Open the user's mail client pre-filled to the business email
-    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
-    setTimeout(() => {
+    try {
+      const source = /cctv/i.test(parsed.data.service) ? "cctv"
+        : /stream/i.test(parsed.data.service) ? "livestream"
+        : /product/i.test(parsed.data.service) ? "product" : "contact";
+      await submit({ data: {
+        source, name: parsed.data.name, email: parsed.data.email, phone: parsed.data.phone,
+        service_type: parsed.data.service, message: parsed.data.message,
+        package: "", location: "",
+      } });
+      setSent(true);
+      toast.success("Message received — we'll respond within 1 business day.");
+      (e.target as HTMLFormElement).reset();
+      setService("");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
       setSubmitting(false);
-      toast.success("Opening your email app — message ready to send.");
-    }, 400);
+    }
   };
+
+  if (sent) {
+    return (
+      <div className="mt-6 rounded-2xl border border-border bg-emerald-500/10 p-6 text-center">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-500/20 text-emerald-700 text-2xl">✓</div>
+        <h3 className="mt-3 text-lg font-bold">Message received</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Our team will reach out within 1 business day.</p>
+        <button onClick={()=>setSent(false)} className="mt-4 text-xs font-semibold underline">Send another message</button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} className="mt-6 grid gap-4">

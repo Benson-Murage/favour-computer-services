@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Video, Mic, Camera, Wifi, Youtube, Facebook, ArrowRight, MessageCircle } from "lucide-react";
-import { QuoteForm } from "@/components/quote-form";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Video, Mic, Camera, Wifi, Youtube, ArrowRight, MessageCircle, Check } from "lucide-react";
+import { LiveStreamBookingForm } from "@/components/booking-form";
+import { getPublicServicePackages } from "@/lib/services-public.functions";
 
 export const Route = createFileRoute("/live-streaming")({
   head: () => ({
@@ -16,15 +19,12 @@ export const Route = createFileRoute("/live-streaming")({
   component: StreamingPage,
 });
 
-const PACKAGES = [
-  { name: "Single Camera", best: "Small services, webinars", from: "From KSh 15,000 / event", inc: ["1 HD camera", "Audio mix", "1 streaming platform"] },
-  { name: "Multi-Camera Pro", best: "Churches, conferences, weddings", from: "From KSh 35,000 / event", inc: ["3 HD cameras", "Live switching", "Multi-platform stream"] },
-  { name: "Premium Event", best: "Concerts, product launches", from: "Custom quote", inc: ["4+ cameras", "Lower thirds & overlays", "Recording & highlights"] },
-];
-
 const EVENTS = ["Church Services", "Conferences", "Weddings", "Corporate Events", "Concerts", "Product Launches"];
 
 function StreamingPage() {
+  const fn = useServerFn(getPublicServicePackages);
+  const { data } = useQuery({ queryKey: ["pub","pkg","ls"], queryFn: () => fn({ data: "livestream" }) });
+  const packages = (data ?? []) as Array<{ id: string; name: string; tagline: string | null; price_label: string | null; description: string | null; features: string[] | null }>;
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -71,15 +71,21 @@ function StreamingPage() {
       <section className="mx-auto max-w-7xl px-4 py-16">
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Streaming packages</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {PACKAGES.map((p) => (
-            <div key={p.name} className="rounded-2xl border border-border bg-card p-6 [box-shadow:var(--shadow-card)]">
+          {packages.map((p) => (
+            <div key={p.id} className="flex flex-col rounded-2xl border border-border bg-card p-6 [box-shadow:var(--shadow-card)]">
               <h3 className="text-lg font-semibold">{p.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{p.best}</p>
-              <div className="mt-4 text-[color:var(--accent)] font-bold">{p.from}</div>
-              <ul className="mt-4 space-y-1.5 text-sm text-foreground">
-                {p.inc.map((i) => <li key={i}>• {i}</li>)}
-              </ul>
-              <a href="#book" className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background">Book now</a>
+              {p.tagline && <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>}
+              {p.price_label && <div className="mt-4 text-[color:var(--accent)] font-bold">{p.price_label}</div>}
+              {(p.features ?? []).length > 0 && (
+                <ul className="mt-4 space-y-1.5 text-sm text-foreground">
+                  {(p.features ?? []).map((f) => (
+                    <li key={f} className="flex gap-1.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--accent)]" /> {f}</li>
+                  ))}
+                </ul>
+              )}
+              <a href="#book" className="mt-auto pt-5">
+                <span className="inline-flex h-10 w-full items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background">Book now</span>
+              </a>
             </div>
           ))}
         </div>
@@ -89,7 +95,7 @@ function StreamingPage() {
         <div className="rounded-3xl border border-border bg-secondary p-8 md:p-10">
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Book a live stream</h2>
           <p className="mt-2 text-sm text-muted-foreground">Share your event details and we'll respond with a quote and availability.</p>
-          <QuoteForm defaultService="Live Streaming" />
+          <div className="mt-6"><LiveStreamBookingForm packages={packages} /></div>
         </div>
       </section>
 

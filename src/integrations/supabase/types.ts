@@ -14,24 +14,165 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_email: string | null
+          admin_id: string | null
+          created_at: string
+          details: Json | null
+          entity: string
+          entity_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          admin_email?: string | null
+          admin_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity: string
+          entity_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          admin_email?: string | null
+          admin_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          created_at: string
+          email: string
+          event_date: string | null
+          event_location: string | null
+          event_type: string | null
+          id: string
+          internal_notes: string | null
+          name: string
+          package: string | null
+          phone: string
+          requirements: string | null
+          status: Database["public"]["Enums"]["booking_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_date?: string | null
+          event_location?: string | null
+          event_type?: string | null
+          id?: string
+          internal_notes?: string | null
+          name: string
+          package?: string | null
+          phone: string
+          requirements?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_date?: string | null
+          event_location?: string | null
+          event_type?: string | null
+          id?: string
+          internal_notes?: string | null
+          name?: string
+          package?: string | null
+          phone?: string
+          requirements?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           created_at: string
           id: string
+          logo_url: string | null
           name: string
           slug: string
+          sort_order: number | null
         }
         Insert: {
           created_at?: string
           id?: string
+          logo_url?: string | null
           name: string
           slug: string
+          sort_order?: number | null
         }
         Update: {
           created_at?: string
           id?: string
+          logo_url?: string | null
           name?: string
           slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      business_settings: {
+        Row: {
+          account_number: string | null
+          address: string | null
+          business_description: string | null
+          company_name: string
+          created_at: string
+          email: string | null
+          id: string
+          paybill_number: string | null
+          payment_instructions: string | null
+          phone: string | null
+          pickup_location: string | null
+          singleton: boolean
+          till_number: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          account_number?: string | null
+          address?: string | null
+          business_description?: string | null
+          company_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          paybill_number?: string | null
+          payment_instructions?: string | null
+          phone?: string | null
+          pickup_location?: string | null
+          singleton?: boolean
+          till_number?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          account_number?: string | null
+          address?: string | null
+          business_description?: string | null
+          company_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          paybill_number?: string | null
+          payment_instructions?: string | null
+          phone?: string | null
+          pickup_location?: string | null
+          singleton?: boolean
+          till_number?: string | null
+          updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -42,6 +183,7 @@ export type Database = {
           id: string
           name: string
           slug: string
+          sort_order: number | null
         }
         Insert: {
           created_at?: string
@@ -49,6 +191,7 @@ export type Database = {
           id?: string
           name: string
           slug: string
+          sort_order?: number | null
         }
         Update: {
           created_at?: string
@@ -56,11 +199,108 @@ export type Database = {
           id?: string
           name?: string
           slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          admin_id: string | null
+          created_at: string
+          delta: number
+          id: string
+          product_id: string
+          reason: string
+          reference_id: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string
+          delta: number
+          id?: string
+          product_id: string
+          reason?: string
+          reference_id?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string
+          delta?: number
+          id?: string
+          product_id?: string
+          reason?: string
+          reference_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          delivery_address: string | null
+          fulfillment: Database["public"]["Enums"]["fulfillment_method"]
+          id: string
+          items: Json
+          notes: string | null
+          pickup_code: string | null
+          reservation_number: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          delivery_address?: string | null
+          fulfillment?: Database["public"]["Enums"]["fulfillment_method"]
+          id?: string
+          items?: Json
+          notes?: string | null
+          pickup_code?: string | null
+          reservation_number?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          delivery_address?: string | null
+          fulfillment?: Database["public"]["Enums"]["fulfillment_method"]
+          id?: string
+          items?: Json
+          notes?: string | null
+          pickup_code?: string | null
+          reservation_number?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
       products: {
         Row: {
+          archived_at: string | null
           brand_id: string | null
           category_id: string | null
           compare_at_price: number | null
@@ -69,20 +309,31 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          images: Json | null
           is_best_seller: boolean | null
           is_featured: boolean | null
+          is_new_arrival: boolean | null
+          is_on_offer: boolean | null
           name: string
+          offer_ends_at: string | null
+          offer_percent: number | null
+          offer_price: number | null
+          offer_starts_at: string | null
           price: number
           processor: string | null
           ram: string | null
           rating: number | null
           review_count: number | null
           slug: string
+          sort_order: number | null
           specs: Json | null
           stock: number
           storage: string | null
+          updated_at: string
+          warranty: string | null
         }
         Insert: {
+          archived_at?: string | null
           brand_id?: string | null
           category_id?: string | null
           compare_at_price?: number | null
@@ -91,20 +342,31 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: Json | null
           is_best_seller?: boolean | null
           is_featured?: boolean | null
+          is_new_arrival?: boolean | null
+          is_on_offer?: boolean | null
           name: string
+          offer_ends_at?: string | null
+          offer_percent?: number | null
+          offer_price?: number | null
+          offer_starts_at?: string | null
           price: number
           processor?: string | null
           ram?: string | null
           rating?: number | null
           review_count?: number | null
           slug: string
+          sort_order?: number | null
           specs?: Json | null
           stock?: number
           storage?: string | null
+          updated_at?: string
+          warranty?: string | null
         }
         Update: {
+          archived_at?: string | null
           brand_id?: string | null
           category_id?: string | null
           compare_at_price?: number | null
@@ -113,18 +375,28 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: Json | null
           is_best_seller?: boolean | null
           is_featured?: boolean | null
+          is_new_arrival?: boolean | null
+          is_on_offer?: boolean | null
           name?: string
+          offer_ends_at?: string | null
+          offer_percent?: number | null
+          offer_price?: number | null
+          offer_starts_at?: string | null
           price?: number
           processor?: string | null
           ram?: string | null
           rating?: number | null
           review_count?: number | null
           slug?: string
+          sort_order?: number | null
           specs?: Json | null
           stock?: number
           storage?: string | null
+          updated_at?: string
+          warranty?: string | null
         }
         Relationships: [
           {
@@ -142,6 +414,184 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      promotions: {
+        Row: {
+          active: boolean
+          created_at: string
+          ends_at: string | null
+          id: string
+          name: string
+          percent_off: number | null
+          price_override: number | null
+          product_id: string | null
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          name: string
+          percent_off?: number | null
+          price_override?: number | null
+          product_id?: string | null
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          name?: string
+          percent_off?: number | null
+          price_override?: number | null
+          product_id?: string | null
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          internal_notes: string | null
+          location: string | null
+          message: string | null
+          metadata: Json | null
+          name: string
+          package: string | null
+          phone: string
+          product_id: string | null
+          service_type: string | null
+          source: Database["public"]["Enums"]["quote_source"]
+          status: Database["public"]["Enums"]["quote_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          internal_notes?: string | null
+          location?: string | null
+          message?: string | null
+          metadata?: Json | null
+          name: string
+          package?: string | null
+          phone: string
+          product_id?: string | null
+          service_type?: string | null
+          source?: Database["public"]["Enums"]["quote_source"]
+          status?: Database["public"]["Enums"]["quote_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          internal_notes?: string | null
+          location?: string | null
+          message?: string | null
+          metadata?: Json | null
+          name?: string
+          package?: string | null
+          phone?: string
+          product_id?: string | null
+          service_type?: string | null
+          source?: Database["public"]["Enums"]["quote_source"]
+          status?: Database["public"]["Enums"]["quote_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_packages: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          equipment: Json | null
+          features: Json | null
+          id: string
+          kind: Database["public"]["Enums"]["service_kind"]
+          name: string
+          price: number | null
+          price_label: string | null
+          sort_order: number | null
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          equipment?: Json | null
+          features?: Json | null
+          id?: string
+          kind: Database["public"]["Enums"]["service_kind"]
+          name: string
+          price?: number | null
+          price_label?: string | null
+          sort_order?: number | null
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          equipment?: Json | null
+          features?: Json | null
+          id?: string
+          kind?: Database["public"]["Enums"]["service_kind"]
+          name?: string
+          price?: number | null
+          price_label?: string | null
+          sort_order?: number | null
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
       wishlists: {
         Row: {
@@ -177,15 +627,41 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_first_admin: { Args: never; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "staff" | "customer"
+      booking_status:
+        | "new"
+        | "contacted"
+        | "quoted"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
+      fulfillment_method: "delivery" | "pickup"
+      order_status:
+        | "pending"
+        | "paid"
+        | "ready"
+        | "picked_up"
+        | "delivered"
+        | "cancelled"
       product_condition:
         | "new"
         | "certified_refurbished"
         | "refurbished_a"
         | "refurbished_b"
         | "open_box"
+      quote_source: "cctv" | "livestream" | "product" | "contact" | "general"
+      quote_status: "new" | "contacted" | "quoted" | "converted" | "cancelled"
+      service_kind: "cctv" | "livestream"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -313,6 +789,24 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "staff", "customer"],
+      booking_status: [
+        "new",
+        "contacted",
+        "quoted",
+        "confirmed",
+        "completed",
+        "cancelled",
+      ],
+      fulfillment_method: ["delivery", "pickup"],
+      order_status: [
+        "pending",
+        "paid",
+        "ready",
+        "picked_up",
+        "delivered",
+        "cancelled",
+      ],
       product_condition: [
         "new",
         "certified_refurbished",
@@ -320,6 +814,9 @@ export const Constants = {
         "refurbished_b",
         "open_box",
       ],
+      quote_source: ["cctv", "livestream", "product", "contact", "general"],
+      quote_status: ["new", "contacted", "quoted", "converted", "cancelled"],
+      service_kind: ["cctv", "livestream"],
     },
   },
 } as const

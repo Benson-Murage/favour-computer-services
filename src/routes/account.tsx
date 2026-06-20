@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Heart, ShoppingBag, MapPin, Settings } from "lucide-react";
+import { LogOut, Heart, ShoppingBag, MapPin, Settings, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { checkIsAdmin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({ meta: [{ title: "Account — Voltline" }] }),
@@ -11,6 +14,9 @@ export const Route = createFileRoute("/account")({
 function Account() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
+  const isAdminFn = useServerFn(checkIsAdmin);
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => { if (user) isAdminFn({}).then((r) => setIsAdmin(r.isAdmin)).catch(() => {}); }, [user, isAdminFn]);
 
   if (loading) return <div className="py-20 text-center text-sm text-muted-foreground">Loading…</div>;
 
@@ -48,6 +54,7 @@ function Account() {
         <Tile to="/cart" Icon={ShoppingBag} t="Cart" s="Items ready to checkout" />
         <Tile to="/account" Icon={MapPin} t="Addresses" s="Manage shipping addresses" />
         <Tile to="/account" Icon={Settings} t="Settings" s="Email, password, preferences" />
+        {isAdmin && <Tile to="/admin" Icon={ShieldCheck} t="Admin Dashboard" s="Manage shop, services & orders" />}
       </div>
 
       <div className="mt-10 rounded-2xl border border-border bg-card p-6">
