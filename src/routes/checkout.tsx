@@ -67,7 +67,7 @@ function CheckoutPage() {
             </Link>
             {settings?.whatsapp && <a href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center rounded-full bg-[color:var(--accent)] px-5 text-sm font-semibold text-accent-foreground">WhatsApp confirmation</a>}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">Sign in with <span className="font-mono">{ /* email */ }</span> to access your order history at any time.</p>
+          <p className="mt-3 text-xs text-muted-foreground">Sign in with the email you used at checkout to access your order history and upload payment proof anytime.</p>
         </div>
       </div>
     );
