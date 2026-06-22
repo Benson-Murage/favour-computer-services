@@ -46,7 +46,7 @@ function OrderDetail() {
     reservation_number: order.reservation_number, pickup_code: order.pickup_code, items,
   };
   const biz = {
-    name: settings?.business_name ?? "Favour Computer Services",
+    name: settings?.company_name ?? "Favour Computer Services",
     address: settings?.address ?? "F&F Building, Shop U13, Next to Odeon Cinema, Nairobi",
     phone: settings?.phone ?? "0726 548 592",
     email: settings?.email ?? "bensonmurage254@gmail.com",
