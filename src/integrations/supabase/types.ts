@@ -203,6 +203,45 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json
+          recipient: string
+          related_id: string | null
+          related_type: string | null
+          status: string
+          subject: string
+          template: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json
+          recipient: string
+          related_id?: string | null
+          related_type?: string | null
+          status?: string
+          subject: string
+          template?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json
+          recipient?: string
+          related_id?: string | null
+          related_type?: string | null
+          status?: string
+          subject?: string
+          template?: string | null
+        }
+        Relationships: []
+      }
       inventory_movements: {
         Row: {
           admin_id: string | null
@@ -241,6 +280,75 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          confirmed: boolean
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          source: string | null
+        }
+        Insert: {
+          confirmed?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          source?: string | null
+        }
+        Update: {
+          confirmed?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          channel: string
+          created_at: string
+          id: string
+          kind: string
+          metadata: Json
+          recipient_email: string | null
+          related_id: string | null
+          related_type: string | null
+          subject: string | null
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          kind: string
+          metadata?: Json
+          recipient_email?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          subject?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          recipient_email?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          subject?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -250,8 +358,10 @@ export type Database = {
           delivery_address: string | null
           fulfillment: Database["public"]["Enums"]["fulfillment_method"]
           id: string
+          invoice_number: string | null
           items: Json
           notes: string | null
+          payment_status: Database["public"]["Enums"]["order_payment_status"]
           pickup_code: string | null
           reservation_number: string | null
           status: Database["public"]["Enums"]["order_status"]
@@ -268,8 +378,10 @@ export type Database = {
           delivery_address?: string | null
           fulfillment?: Database["public"]["Enums"]["fulfillment_method"]
           id?: string
+          invoice_number?: string | null
           items?: Json
           notes?: string | null
+          payment_status?: Database["public"]["Enums"]["order_payment_status"]
           pickup_code?: string | null
           reservation_number?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -286,8 +398,10 @@ export type Database = {
           delivery_address?: string | null
           fulfillment?: Database["public"]["Enums"]["fulfillment_method"]
           id?: string
+          invoice_number?: string | null
           items?: Json
           notes?: string | null
+          payment_status?: Database["public"]["Enums"]["order_payment_status"]
           pickup_code?: string | null
           reservation_number?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -297,6 +411,65 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          id: string
+          method: string | null
+          order_id: string
+          proof_mime: string | null
+          proof_path: string | null
+          reference: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["payment_proof_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string | null
+          order_id: string
+          proof_mime?: string | null
+          proof_path?: string | null
+          reference?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["payment_proof_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string | null
+          order_id?: string
+          proof_mime?: string | null
+          proof_path?: string | null
+          reference?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["payment_proof_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -646,6 +819,11 @@ export type Database = {
         | "completed"
         | "cancelled"
       fulfillment_method: "delivery" | "pickup"
+      order_payment_status:
+        | "unpaid"
+        | "awaiting_verification"
+        | "paid"
+        | "refunded"
       order_status:
         | "pending"
         | "paid"
@@ -653,6 +831,7 @@ export type Database = {
         | "picked_up"
         | "delivered"
         | "cancelled"
+      payment_proof_status: "pending" | "approved" | "rejected"
       product_condition:
         | "new"
         | "certified_refurbished"
@@ -799,6 +978,12 @@ export const Constants = {
         "cancelled",
       ],
       fulfillment_method: ["delivery", "pickup"],
+      order_payment_status: [
+        "unpaid",
+        "awaiting_verification",
+        "paid",
+        "refunded",
+      ],
       order_status: [
         "pending",
         "paid",
@@ -807,6 +992,7 @@ export const Constants = {
         "delivered",
         "cancelled",
       ],
+      payment_proof_status: ["pending", "approved", "rejected"],
       product_condition: [
         "new",
         "certified_refurbished",

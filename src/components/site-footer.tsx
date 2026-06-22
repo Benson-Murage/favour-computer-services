@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Cpu, Phone, Mail, MapPin } from "lucide-react";
+import { NewsletterForm } from "@/components/newsletter-form";
 
 export function SiteFooter() {
   return (
@@ -46,17 +47,7 @@ export function SiteFooter() {
               Request a quote
             </Link>
           </div>
-          <form className="mt-5 flex gap-2">
-            <input
-              type="email"
-              required
-              placeholder="you@email.com"
-              className="h-10 flex-1 rounded-full border border-background/20 bg-background/10 px-4 text-sm text-background placeholder:text-background/50 outline-none focus:border-[color:var(--accent)]"
-            />
-            <button className="h-10 rounded-full border border-background/30 px-4 text-sm font-semibold text-background transition hover:bg-background/10">
-              Join
-            </button>
-          </form>
+          <NewsletterForm source="footer" dark />
         </div>
       </div>
       <div className="border-t border-background/10">
