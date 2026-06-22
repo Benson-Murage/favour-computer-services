@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Heart, ShoppingBag, MapPin, Settings, ShieldCheck } from "lucide-react";
+import { LogOut, Heart, ShoppingBag, MapPin, Settings, ShieldCheck, Receipt } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +50,7 @@ function Account() {
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Tile to="/account/orders" Icon={Receipt} t="My Orders" s="Receipts, invoices & status" />
         <Tile to="/wishlist" Icon={Heart} t="Wishlist" s="Saved products" />
         <Tile to="/cart" Icon={ShoppingBag} t="Cart" s="Items ready to checkout" />
         <Tile to="/account" Icon={MapPin} t="Addresses" s="Manage shipping addresses" />
@@ -58,8 +59,10 @@ function Account() {
       </div>
 
       <div className="mt-10 rounded-2xl border border-border bg-card p-6">
-        <h2 className="text-base font-semibold">Recent orders</h2>
-        <p className="mt-2 text-sm text-muted-foreground">You have no orders yet. <Link to="/shop" className="font-semibold text-foreground underline">Start shopping</Link>.</p>
+        <h2 className="text-base font-semibold">Need a receipt or to upload a payment proof?</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Open <Link to="/account/orders" className="font-semibold text-foreground underline">My Orders</Link> to view receipts, download invoices, and upload M-Pesa proof of payment.
+        </p>
       </div>
     </div>
   );
