@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { checkIsAdmin, claimFirstAdmin } from "@/lib/admin.functions";
@@ -17,7 +17,8 @@ function AdminGate() {
     (async () => {
       const r = await check({});
       if (r.isAdmin) return setState("ok");
-      // try to claim first admin (only succeeds if no admin exists yet)
+      // Auto-claim only succeeds for the designated Super Admin email
+      // (bensonmurage254@gmail.com). All other accounts are denied.
       const claimed = await claim({});
       if (claimed.claimed) return setState("ok");
       setState("no");
@@ -32,7 +33,9 @@ function AdminGate() {
       <div className="mx-auto max-w-md p-16 text-center">
         <h2 className="text-xl font-bold">Admin access required</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your account does not have administrator privileges. Contact an existing admin to grant you access.
+          Your account does not have administrator privileges. The Super Admin
+          account for Favour Computer Services is <span className="font-mono">bensonmurage254@gmail.com</span>.
+          Sign in with that account to manage the platform.
         </p>
       </div>
     );
