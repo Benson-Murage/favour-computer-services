@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertAdmin, logAudit } from "./admin/audit.server";
 import type { Database } from "@/integrations/supabase/types";
+import { notifyBoth } from "./notify.server";
 
 const QuoteInput = z.object({
   source: z.enum(["cctv", "livestream", "product", "contact", "general"]).default("general"),
@@ -57,6 +58,17 @@ export const submitQuote = createServerFn({ method: "POST" })
         details: data as never,
       });
     } catch { /* non-fatal */ }
+    await notifyBoth(supabase, {
+      customerEmail: data.email,
+      customerUserId: null,
+      kind: `quote-${data.source}`,
+      adminSubject: `New ${data.source} quote request from ${data.name}`,
+      adminBody: `Name: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nPackage: ${data.package || "—"}\nLocation: ${data.location || "—"}\nService: ${data.service_type || "—"}\n\nMessage:\n${data.message || "—"}`,
+      customerSubject: `We received your request — Favour Computer Services`,
+      customerBody: `Hi ${data.name},\n\nThanks for reaching out. Our team has received your ${data.source} inquiry and will get back to you shortly with a tailored quote.\n\nFavour Computer Services\n0726 548 592`,
+      relatedType: "quote",
+      relatedId: row.id,
+    });
     return { id: row.id };
   });
 
@@ -90,6 +102,17 @@ export const submitBooking = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await notifyBoth(supabase, {
+      customerEmail: data.email,
+      customerUserId: null,
+      kind: "booking-livestream",
+      adminSubject: `New live-streaming booking from ${data.name}`,
+      adminBody: `Name: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nEvent type: ${data.event_type}\nDate: ${data.event_date ?? "—"}\nLocation: ${data.event_location}\nPackage: ${data.package}\n\nRequirements:\n${data.requirements || "—"}`,
+      customerSubject: `Booking received — Favour Computer Services`,
+      customerBody: `Hi ${data.name},\n\nThanks for booking our live-streaming service. We've recorded your event details and our team will confirm availability and pricing shortly.\n\nFavour Computer Services`,
+      relatedType: "booking",
+      relatedId: row.id,
+    });
     return { id: row.id };
   });
 
