@@ -62,8 +62,12 @@ function CheckoutPage() {
           )}
           <div className="mt-6 flex justify-center gap-3">
             <button onClick={()=>{ clear(); nav({ to: "/shop" }); }} className="inline-flex h-10 items-center rounded-full bg-foreground px-5 text-sm font-semibold text-background">Continue shopping</button>
+            <Link to="/account/orders/$id" params={{ id: done.id }} className="inline-flex h-10 items-center rounded-full border border-border bg-card px-5 text-sm font-semibold">
+              View order & upload payment proof
+            </Link>
             {settings?.whatsapp && <a href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center rounded-full bg-[color:var(--accent)] px-5 text-sm font-semibold text-accent-foreground">WhatsApp confirmation</a>}
           </div>
+          <p className="mt-3 text-xs text-muted-foreground">Sign in with <span className="font-mono">{ /* email */ }</span> to access your order history at any time.</p>
         </div>
       </div>
     );
