@@ -18,6 +18,7 @@ export const getBusinessSettings = createServerFn({ method: "GET" }).handler(asy
 type SettingsUpdate = Partial<{
   company_name: string;
   business_description: string;
+  tagline: string;
   address: string;
   email: string;
   phone: string;
@@ -27,6 +28,25 @@ type SettingsUpdate = Partial<{
   account_number: string;
   payment_instructions: string;
   pickup_location: string;
+  facebook_url: string;
+  instagram_url: string;
+  tiktok_url: string;
+  twitter_url: string;
+  linkedin_url: string;
+  youtube_url: string;
+  whatsapp_url: string;
+  sender_name: string;
+  sender_email: string;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_cta_primary_label: string;
+  hero_cta_primary_url: string;
+  hero_cta_secondary_label: string;
+  hero_cta_secondary_url: string;
+  about_story: string;
+  about_mission: string;
+  about_vision: string;
+  contact_hours: string;
 }>;
 
 export const updateBusinessSettings = createServerFn({ method: "POST" })
