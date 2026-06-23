@@ -5,6 +5,7 @@ import { getBusinessSettings } from "./settings.functions";
 export type BusinessSettings = {
   company_name: string;
   business_description: string | null;
+  tagline: string | null;
   address: string | null;
   email: string | null;
   phone: string | null;
@@ -14,6 +15,25 @@ export type BusinessSettings = {
   account_number: string | null;
   payment_instructions: string | null;
   pickup_location: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  twitter_url: string | null;
+  linkedin_url: string | null;
+  youtube_url: string | null;
+  whatsapp_url: string | null;
+  sender_name: string | null;
+  sender_email: string | null;
+  hero_title: string | null;
+  hero_subtitle: string | null;
+  hero_cta_primary_label: string | null;
+  hero_cta_primary_url: string | null;
+  hero_cta_secondary_label: string | null;
+  hero_cta_secondary_url: string | null;
+  about_story: string | null;
+  about_mission: string | null;
+  about_vision: string | null;
+  contact_hours: string | null;
 };
 
 export function useBusinessSettings() {
