@@ -161,6 +161,7 @@ function ProductForm({ initial, categories, brands, onSave }: {
     offer_price: init.offer_price ?? "",
     offer_starts_at: init.offer_starts_at ?? "",
     offer_ends_at: init.offer_ends_at ?? "",
+    image_urls: Array.isArray(init.image_urls) ? (init.image_urls as string[]) : [],
   });
   const set = (k: string, v: unknown) => setForm((s) => ({ ...s, [k]: v }));
   const [uploading, setUploading] = useState(false);
@@ -227,6 +228,12 @@ function ProductForm({ initial, categories, brands, onSave }: {
         </div>
         <Input className="mt-2" placeholder="Or paste image URL" value={String(form.image_url ?? "")} onChange={(e)=>set("image_url", e.target.value)} />
       </div>
+      <ImageUrlList
+        urls={(form.image_urls as string[]) ?? []}
+        featured={String(form.image_url ?? "")}
+        onChange={(next)=>set("image_urls", next)}
+        onFeature={(u)=>set("image_url", u)}
+      />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {(["is_featured","is_new_arrival","is_best_seller","is_on_offer"] as const).map((k) => (
           <label key={k} className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 text-xs">
