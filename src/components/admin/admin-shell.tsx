@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Tags, Building2, Boxes, MessageSquare, CalendarCheck2, Store, Megaphone, Settings, ScrollText, ShoppingCart, Wallet, Mail, Newspaper } from "lucide-react";
+import { LayoutDashboard, Package, Tags, Building2, Boxes, MessageSquare, CalendarCheck2, Store, Megaphone, Settings, ScrollText, ShoppingCart, Wallet, Mail, Newspaper, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ const NAV: NavEntry[] = [
   { to: "/admin/promotions", label: "Promotions", Icon: Megaphone },
   { to: "/admin/newsletter", label: "Newsletter", Icon: Newspaper },
   { to: "/admin/emails", label: "Email Center", Icon: Mail },
+  { to: "/admin/users", label: "Users", Icon: Users },
   { to: "/admin/settings", label: "Business Settings", Icon: Settings },
   { to: "/admin/audit", label: "Audit Log", Icon: ScrollText },
 ] as const;
