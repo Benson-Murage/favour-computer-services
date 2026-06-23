@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, Target, Eye, MapPin, Phone, Mail } from "lucide-react";
+import { useBusinessSettings } from "@/lib/use-business-settings";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -16,6 +17,13 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const s = useBusinessSettings();
+  const story = s?.about_story || "Started in the heart of Nairobi, Favour Computer Services has grown into a one-stop shop for genuine devices, professional CCTV installation, and reliable live streaming for events of every size.";
+  const mission = s?.about_mission || "To provide reliable technology products and services that empower customers through innovation, quality and exceptional support.";
+  const vision = s?.about_vision || "To become one of Kenya's most trusted technology solution providers.";
+  const address = s?.address || "F&F Building, Shop U13, next to Odeon Cinema, Nairobi";
+  const phone = s?.phone || "0726 548 592";
+  const email = s?.email || "bensonmurage254@gmail.com";
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -37,17 +45,17 @@ function AboutPage() {
 
       <section className="mx-auto max-w-5xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-3">
-          <Card Icon={Award} title="Our Story" body="Started in the heart of Nairobi, Favour Computer Services has grown into a one-stop shop for genuine devices, professional CCTV installation, and reliable live streaming for events of every size." />
-          <Card Icon={Target} title="Our Mission" body="To provide reliable technology products and services that empower customers through innovation, quality and exceptional support." />
-          <Card Icon={Eye} title="Our Vision" body="To become one of Kenya's most trusted technology solution providers." />
+          <Card Icon={Award} title="Our Story" body={story} />
+          <Card Icon={Target} title="Our Mission" body={mission} />
+          <Card Icon={Eye} title="Our Vision" body={vision} />
         </div>
       </section>
 
       <section className="mx-auto max-w-5xl px-4 pb-20">
         <div className="grid gap-6 rounded-3xl border border-border bg-secondary p-8 md:grid-cols-3 md:p-10">
-          <Info Icon={MapPin} t="Visit our shop" s="F&F Building, Shop U13, next to Odeon Cinema, Nairobi" />
-          <Info Icon={Phone} t="Call or WhatsApp" s="0726 548 592" href="tel:+254726548592" />
-          <Info Icon={Mail} t="Email us" s="bensonmurage254@gmail.com" href="mailto:bensonmurage254@gmail.com" />
+          <Info Icon={MapPin} t="Visit our shop" s={address} />
+          <Info Icon={Phone} t="Call or WhatsApp" s={phone} href={`tel:${phone.replace(/\s/g,"")}`} />
+          <Info Icon={Mail} t="Email us" s={email} href={`mailto:${email}`} />
         </div>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link to="/shop" className="inline-flex h-11 items-center rounded-full bg-foreground px-5 text-sm font-semibold text-background">Shop products</Link>
