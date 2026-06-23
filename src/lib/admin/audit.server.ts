@@ -23,7 +23,16 @@ export async function logAudit(
 }
 
 export async function assertAdmin(supabase: SupabaseClient<Database>, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  const [{ data: isAdmin, error: e1 }, { data: isSuper, error: e2 }] = await Promise.all([
+    supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+    supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" as never }),
+  ]);
+  if (e1 && e2) throw new Error(e1.message);
+  if (!isAdmin && !isSuper) throw new Error("Forbidden: admin access required");
+}
+
+export async function assertSuperAdmin(supabase: SupabaseClient<Database>, userId: string) {
+  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" as never });
   if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden: admin access required");
+  if (!data) throw new Error("Forbidden: super admin access required");
 }
