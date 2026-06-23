@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { QuoteForm } from "@/components/quote-form";
+import { useBusinessSettings } from "@/lib/use-business-settings";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -17,6 +18,13 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const s = useBusinessSettings();
+  const name = s?.company_name || "Favour Computer Services";
+  const address = (s?.address || "F&F Building, Shop U13\nNext to Odeon Cinema, Nairobi").split("\n");
+  const phone = s?.phone || "0726 548 592";
+  const email = s?.email || "bensonmurage254@gmail.com";
+  const wa = s?.whatsapp_url || (s?.whatsapp ? `https://wa.me/${s.whatsapp.replace(/\D/g, "")}` : "https://wa.me/254726548592");
+  const hours = (s?.contact_hours || "Mon – Sat · 8:30 AM – 6:30 PM\nSun · Closed").split("\n");
   return (
     <div className="mx-auto max-w-7xl px-4 py-16">
       <div className="max-w-2xl">
@@ -30,11 +38,11 @@ function ContactPage() {
 
       <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
         <aside className="space-y-4">
-          <Box Icon={MapPin} t="Visit us" lines={["Favour Computer Services", "F&F Building, Shop U13", "Next to Odeon Cinema, Nairobi"]} />
-          <Box Icon={Phone} t="Call or SMS" lines={["0726 548 592"]} href="tel:+254726548592" />
-          <Box Icon={MessageCircle} t="WhatsApp" lines={["wa.me/254726548592"]} href="https://wa.me/254726548592" />
-          <Box Icon={Mail} t="Email" lines={["bensonmurage254@gmail.com"]} href="mailto:bensonmurage254@gmail.com" />
-          <Box Icon={Clock} t="Hours" lines={["Mon – Sat · 8:30 AM – 6:30 PM", "Sun · Closed"]} />
+          <Box Icon={MapPin} t="Visit us" lines={[name, ...address]} />
+          <Box Icon={Phone} t="Call or SMS" lines={[phone]} href={`tel:${phone.replace(/\s/g,"")}`} />
+          <Box Icon={MessageCircle} t="WhatsApp" lines={[wa.replace(/^https?:\/\//, "")]} href={wa} />
+          <Box Icon={Mail} t="Email" lines={[email]} href={`mailto:${email}`} />
+          <Box Icon={Clock} t="Hours" lines={hours} />
         </aside>
 
         <div className="rounded-3xl border border-border bg-secondary p-6 md:p-10">
