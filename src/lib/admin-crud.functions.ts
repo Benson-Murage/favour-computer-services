@@ -29,6 +29,7 @@ const ProductInput = z.object({
   brand_id: z.string().uuid().optional().nullable(),
   image_url: z.string().max(1000).optional().nullable(),
   images: z.array(z.string()).optional().default([]),
+  image_urls: z.array(z.string()).optional().default([]),
   stock: z.coerce.number().int().min(0).default(0),
   warranty: z.string().max(400).optional().default(""),
   ram: z.string().max(80).optional().nullable(),

@@ -124,55 +124,115 @@ export type Database = {
       }
       business_settings: {
         Row: {
+          about_mission: string | null
+          about_story: string | null
+          about_vision: string | null
           account_number: string | null
           address: string | null
           business_description: string | null
           company_name: string
+          contact_hours: string | null
           created_at: string
           email: string | null
+          facebook_url: string | null
+          hero_cta_primary_label: string | null
+          hero_cta_primary_url: string | null
+          hero_cta_secondary_label: string | null
+          hero_cta_secondary_url: string | null
+          hero_subtitle: string | null
+          hero_title: string | null
           id: string
+          instagram_url: string | null
+          linkedin_url: string | null
           paybill_number: string | null
           payment_instructions: string | null
           phone: string | null
           pickup_location: string | null
+          sender_email: string | null
+          sender_name: string | null
           singleton: boolean
+          tagline: string | null
+          tiktok_url: string | null
           till_number: string | null
+          twitter_url: string | null
           updated_at: string
           whatsapp: string | null
+          whatsapp_url: string | null
+          youtube_url: string | null
         }
         Insert: {
+          about_mission?: string | null
+          about_story?: string | null
+          about_vision?: string | null
           account_number?: string | null
           address?: string | null
           business_description?: string | null
           company_name?: string
+          contact_hours?: string | null
           created_at?: string
           email?: string | null
+          facebook_url?: string | null
+          hero_cta_primary_label?: string | null
+          hero_cta_primary_url?: string | null
+          hero_cta_secondary_label?: string | null
+          hero_cta_secondary_url?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
           paybill_number?: string | null
           payment_instructions?: string | null
           phone?: string | null
           pickup_location?: string | null
+          sender_email?: string | null
+          sender_name?: string | null
           singleton?: boolean
+          tagline?: string | null
+          tiktok_url?: string | null
           till_number?: string | null
+          twitter_url?: string | null
           updated_at?: string
           whatsapp?: string | null
+          whatsapp_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
+          about_mission?: string | null
+          about_story?: string | null
+          about_vision?: string | null
           account_number?: string | null
           address?: string | null
           business_description?: string | null
           company_name?: string
+          contact_hours?: string | null
           created_at?: string
           email?: string | null
+          facebook_url?: string | null
+          hero_cta_primary_label?: string | null
+          hero_cta_primary_url?: string | null
+          hero_cta_secondary_label?: string | null
+          hero_cta_secondary_url?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
           paybill_number?: string | null
           payment_instructions?: string | null
           phone?: string | null
           pickup_location?: string | null
+          sender_email?: string | null
+          sender_name?: string | null
           singleton?: boolean
+          tagline?: string | null
+          tiktok_url?: string | null
           till_number?: string | null
+          twitter_url?: string | null
           updated_at?: string
           whatsapp?: string | null
+          whatsapp_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
@@ -482,6 +542,7 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          image_urls: Json
           images: Json | null
           is_best_seller: boolean | null
           is_featured: boolean | null
@@ -515,6 +576,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: Json
           images?: Json | null
           is_best_seller?: boolean | null
           is_featured?: boolean | null
@@ -548,6 +610,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: Json
           images?: Json | null
           is_best_seller?: boolean | null
           is_featured?: boolean | null
@@ -745,6 +808,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          created_at: string
+          disabled: boolean
+          full_name: string | null
+          last_login_at: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          disabled?: boolean
+          full_name?: string | null
+          last_login_at?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          disabled?: boolean
+          full_name?: string | null
+          last_login_at?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -808,9 +901,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "staff" | "customer"
+      app_role: "admin" | "staff" | "customer" | "super_admin"
       booking_status:
         | "new"
         | "contacted"
@@ -968,7 +1062,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "staff", "customer"],
+      app_role: ["admin", "staff", "customer", "super_admin"],
       booking_status: [
         "new",
         "contacted",
