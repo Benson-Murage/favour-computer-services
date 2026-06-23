@@ -254,3 +254,53 @@ function ProductForm({ initial, categories, brands, onSave }: {
     </form>
   );
 }
+
+function ImageUrlList({ urls, featured, onChange, onFeature }: {
+  urls: string[];
+  featured: string;
+  onChange: (next: string[]) => void;
+  onFeature: (u: string) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const add = () => {
+    const u = draft.trim();
+    if (!u) return;
+    if (urls.includes(u)) { setDraft(""); return; }
+    onChange([...urls, u]);
+    setDraft("");
+  };
+  const remove = (u: string) => onChange(urls.filter((x) => x !== u));
+  const move = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= urls.length) return;
+    const next = urls.slice();
+    [next[i], next[j]] = [next[j]!, next[i]!];
+    onChange(next);
+  };
+  return (
+    <div>
+      <Label>Additional image URLs</Label>
+      <p className="mt-1 text-[11px] text-muted-foreground">Paste image links from manufacturer, supplier, CDN, or hosting sites. Set any as the featured image.</p>
+      <div className="mt-2 flex gap-2">
+        <Input value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder="https://example.com/product.jpg" />
+        <Btn variant="secondary" onClick={add}>Add</Btn>
+      </div>
+      {urls.length > 0 && (
+        <ul className="mt-3 grid gap-2">
+          {urls.map((u, i) => (
+            <li key={u} className="flex items-center gap-3 rounded-lg border border-border bg-card p-2">
+              <img src={u} alt="" className="h-10 w-10 rounded object-cover" />
+              <span className="flex-1 truncate text-xs">{u}</span>
+              {featured === u
+                ? <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase text-background">Featured</span>
+                : <Btn variant="ghost" onClick={()=>onFeature(u)}>Set featured</Btn>}
+              <Btn variant="ghost" onClick={()=>move(i,-1)}>↑</Btn>
+              <Btn variant="ghost" onClick={()=>move(i, 1)}>↓</Btn>
+              <Btn variant="danger" onClick={()=>remove(u)}>Remove</Btn>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
