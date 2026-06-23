@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/product-card";
+import { useBusinessSettings } from "@/lib/use-business-settings";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Laptop, Monitor, Smartphone, Tablet, HardDrive, MemoryStick,
@@ -56,6 +57,11 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data } = useSuspenseQuery(homeData);
+  const settings = useBusinessSettings();
+  const heroTitle = settings?.hero_title?.trim();
+  const heroSubtitle = settings?.hero_subtitle?.trim();
+  const ctaPrimary = { label: settings?.hero_cta_primary_label?.trim() || "Shop Products", url: settings?.hero_cta_primary_url?.trim() || "/shop" };
+  const ctaSecondary = { label: settings?.hero_cta_secondary_label?.trim() || "Get a Quote", url: settings?.hero_cta_secondary_url?.trim() || "/contact" };
 
   return (
     <div className="flex flex-col">
@@ -68,24 +74,24 @@ function Home() {
             <span className="inline-flex items-center gap-2 rounded-full bg-background/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" /> Trusted in Nairobi since day one
             </span>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
-              Your Trusted Technology<br />
-              Partner in <span className="text-[color:var(--accent)]">Nairobi.</span>
-            </h1>
+            {heroTitle ? (
+              <h1 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">{heroTitle}</h1>
+            ) : (
+              <h1 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
+                Your Trusted Technology<br />
+                Partner in <span className="text-[color:var(--accent)]">Nairobi.</span>
+              </h1>
+            )}
             <p className="mt-5 max-w-lg text-base text-background/75 md:text-lg">
-              Premium laptops, computers, CCTV solutions, live streaming services and genuine tech
-              accessories — new and refurbished. Order online or pick up at our shop.
+              {heroSubtitle || "Premium laptops, computers, CCTV solutions, live streaming services and genuine tech accessories — new and refurbished. Order online or pick up at our shop."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/shop" className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground transition hover:scale-[1.02]">
-                Shop Products <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                to="/contact"
-                className="inline-flex h-12 items-center gap-2 rounded-full border border-background/30 bg-background/5 px-6 text-sm font-semibold text-background backdrop-blur transition hover:bg-background/15"
-              >
-                Get a Quote
-              </Link>
+              <a href={ctaPrimary.url} className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground transition hover:scale-[1.02]">
+                {ctaPrimary.label} <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href={ctaSecondary.url} className="inline-flex h-12 items-center gap-2 rounded-full border border-background/30 bg-background/5 px-6 text-sm font-semibold text-background backdrop-blur transition hover:bg-background/15">
+                {ctaSecondary.label}
+              </a>
             </div>
             <div className="mt-10 grid max-w-md grid-cols-3 gap-4 text-sm">
               <Stat n="500+" l="Devices in stock" />
