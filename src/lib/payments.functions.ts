@@ -9,7 +9,7 @@ const SubmitInput = z.object({
   amount: z.coerce.number().min(0),
   method: z.string().trim().max(40).optional().default(""),
   reference: z.string().trim().max(120).optional().default(""),
-  proof_path: z.string().trim().min(1).max(500),
+  proof_path: z.string().trim().max(500).optional().default(""),
   proof_mime: z.string().trim().max(80).optional().default(""),
 });
 
@@ -22,6 +22,9 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
     if (oerr) throw new Error(oerr.message);
     if (!order) throw new Error("Order not found");
 
+    if (!data.proof_path && !data.reference) {
+      throw new Error("Provide a transaction reference or upload a screenshot.");
+    }
     const { data: row, error } = await context.supabase
       .from("payments")
       .insert({
@@ -30,7 +33,7 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
         amount: data.amount,
         method: data.method ?? "",
         reference: data.reference ?? "",
-        proof_path: data.proof_path,
+        proof_path: data.proof_path || null,
         proof_mime: data.proof_mime ?? "",
         status: "pending",
       })
