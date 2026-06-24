@@ -3,7 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { Btn, Card, Select, StatusPill } from "@/components/admin/ui";
+import { Card, Select, StatusPill } from "@/components/admin/ui";
+import { confirmAction } from "@/components/admin/confirm";
 import { listOrders, updateOrderStatus } from "@/lib/admin-crud.functions";
 import { formatPrice } from "@/lib/format";
 
@@ -33,7 +34,20 @@ function OrdersPage() {
                 <td className="p-3">{formatPrice(Number(o.total))}</td>
                 <td className="p-3"><StatusPill tone={o.status==="cancelled"?"danger":o.status==="delivered"||o.status==="picked_up"?"success":"info"}>{o.status}</StatusPill></td>
                 <td className="p-3">
-                  <Select value={o.status} onChange={async (e)=>{ await upd({ data: { id: o.id, status: e.target.value as typeof STATUSES[number] } }); toast.success("Updated"); qc.invalidateQueries({ queryKey: ["adm","orders"] }); }}>
+                  <Select value={o.status} onChange={async (e)=>{
+                    const next = e.target.value as typeof STATUSES[number];
+                    const labels: Record<string,string> = { paid: "PAID", ready: "READY FOR PICKUP", picked_up: "PICKED UP", delivered: "DELIVERED", cancelled: "CANCELLED", pending: "PENDING" };
+                    const ok = await confirmAction({
+                      title: `Mark order as ${labels[next] ?? next.toUpperCase()}?`,
+                      message: `${o.customer_name} · ${formatPrice(Number(o.total))}`,
+                      confirmLabel: "Update status",
+                      tone: next === "cancelled" ? "danger" : "primary",
+                    });
+                    if (!ok) { e.target.value = o.status; return; }
+                    await upd({ data: { id: o.id, status: next } });
+                    toast.success(`Order ${labels[next]?.toLowerCase() ?? next}`);
+                    qc.invalidateQueries({ queryKey: ["adm","orders"] });
+                  }}>
                     {STATUSES.map((s)=><option key={s} value={s}>{s}</option>)}
                   </Select>
                 </td>
