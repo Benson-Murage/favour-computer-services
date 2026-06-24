@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Download, Printer, Upload, FileText, Clock, MapPin, CheckCircle2, XCircle } from "lucide-react";
+import { Download, Printer, Upload, FileText, Clock, MapPin, CheckCircle2, XCircle, Info, MessageCircle } from "lucide-react";
 import { getMyOrder } from "@/lib/orders.functions";
 import { submitPaymentProof, getProofSignedUrl } from "@/lib/payments.functions";
 import { Btn, Field, Input, StatusPill } from "@/components/admin/ui";
@@ -53,16 +53,23 @@ function OrderDetail() {
     till_number: settings?.till_number, paybill_number: settings?.paybill_number, account_number: settings?.account_number,
   };
 
-  const upload = async (file: File, amount: number, method: string, reference: string) => {
+  const submit = async (file: File | null, amount: number, method: string, reference: string, note: string) => {
     if (!user) return;
-    const ext = (file.name.split(".").pop() ?? "bin").toLowerCase();
-    const path = `${user.id}/${order.id}/${Date.now()}.${ext}`;
+    if (!file && !reference.trim()) { toast.error("Add a transaction code OR upload a screenshot"); return; }
     setBusy(true);
     try {
-      const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, file, { contentType: file.type, upsert: false });
-      if (upErr) throw upErr;
-      await submitProof({ data: { order_id: order.id, amount, method, reference, proof_path: path, proof_mime: file.type } });
-      toast.success("Payment proof submitted — awaiting verification");
+      let proof_path: string | undefined;
+      let proof_mime: string | undefined;
+      if (file) {
+        const ext = (file.name.split(".").pop() ?? "bin").toLowerCase();
+        proof_path = `${user.id}/${order.id}/${Date.now()}.${ext}`;
+        proof_mime = file.type;
+        const { error: upErr } = await supabase.storage.from("payment-proofs").upload(proof_path, file, { contentType: file.type, upsert: false });
+        if (upErr) throw upErr;
+      }
+      const finalRef = note.trim() ? `${reference}${reference && note ? " — " : ""}${note}` : reference;
+      await submitProof({ data: { order_id: order.id, amount, method, reference: finalRef, proof_path, proof_mime } });
+      toast.success("Payment proof submitted — we'll verify shortly");
       await reload();
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(false); }
@@ -136,7 +143,14 @@ function OrderDetail() {
 
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="text-sm font-bold">Pay & upload proof</h3>
-            <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+            <div className="mt-3 flex gap-2 rounded-xl bg-secondary/60 p-3 text-xs">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--accent)]" />
+              <p>
+                Upload your payment screenshot or proof of payment <strong>directly here</strong>.
+                You can also just paste the M-Pesa transaction code — no file required.
+              </p>
+            </div>
+            <div className="mt-3 space-y-1 text-xs text-muted-foreground">
               {settings?.till_number && <div>M-Pesa Till: <span className="font-mono font-semibold text-foreground">{settings.till_number}</span></div>}
               {settings?.paybill_number && <div>M-Pesa Paybill: <span className="font-mono font-semibold text-foreground">{settings.paybill_number}</span>{settings.account_number ? ` · Account ${settings.account_number}` : ""}</div>}
               {settings?.payment_instructions && <p className="mt-1">{settings.payment_instructions}</p>}
@@ -144,21 +158,35 @@ function OrderDetail() {
 
             <form className="mt-4 space-y-2" onSubmit={async (e) => {
               e.preventDefault();
-              const fd = new FormData(e.currentTarget);
-              const file = fileRef.current?.files?.[0];
-              if (!file) { toast.error("Choose a proof file"); return; }
-              await upload(file, Number(fd.get("amount") ?? 0), String(fd.get("method") ?? "M-Pesa"), String(fd.get("reference") ?? ""));
-              (e.currentTarget as HTMLFormElement).reset();
+              const form = e.currentTarget;
+              const fd = new FormData(form);
+              const file = fileRef.current?.files?.[0] ?? null;
+              await submit(
+                file,
+                Number(fd.get("amount") ?? 0),
+                String(fd.get("method") ?? "M-Pesa"),
+                String(fd.get("reference") ?? ""),
+                String(fd.get("note") ?? ""),
+              );
+              form.reset();
               if (fileRef.current) fileRef.current.value = "";
             }}>
               <Field label="Amount (KES)"><Input name="amount" type="number" min={0} step={1} defaultValue={Number(order.total)} required /></Field>
               <Field label="Method"><Input name="method" defaultValue="M-Pesa" /></Field>
-              <Field label="Reference / Transaction code"><Input name="reference" placeholder="e.g. SLM7XYZ12" /></Field>
-              <Field label="Proof (JPG, PNG, WEBP or PDF)">
-                <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required
+              <Field label="M-Pesa transaction code / reference"><Input name="reference" placeholder="e.g. SLM7XYZ12" /></Field>
+              <Field label="Payment message / note (optional)"><Input name="note" placeholder="Paste M-Pesa SMS message or any note" /></Field>
+              <Field label="Screenshot (optional — JPG, PNG, WEBP or PDF)">
+                <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf"
                   className="block w-full text-xs file:mr-3 file:rounded-full file:border-0 file:bg-foreground file:px-3 file:py-2 file:text-xs file:font-semibold file:text-background" />
               </Field>
               <Btn type="submit" disabled={busy} className="w-full !h-10"><Upload className="mr-1 h-3.5 w-3.5" />{busy ? "Uploading…" : "Submit proof"}</Btn>
+              {settings?.whatsapp && (
+                <a href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}?text=${encodeURIComponent(`Hi, I just paid for order ${order.invoice_number ?? order.id.slice(0,8)}.`)}`}
+                   target="_blank" rel="noreferrer"
+                   className="mt-2 flex items-center justify-center gap-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground">
+                  <MessageCircle className="h-3.5 w-3.5" /> Prefer WhatsApp? Contact us (optional)
+                </a>
+              )}
             </form>
           </div>
 
