@@ -5,8 +5,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Field, Input, Modal } from "@/components/admin/ui";
+import { ImagePreview, ImageUrlField } from "@/components/admin/image-input";
+import { confirmAction } from "@/components/admin/confirm";
 import { listBrandsAdmin, saveBrand, deleteBrand } from "@/lib/admin-crud.functions";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/brands")({ component: BrandsPage });
 
@@ -31,12 +32,18 @@ function BrandsPage() {
           <tbody className="divide-y divide-border">
             {((data ?? []) as Brand[]).map((b) => (
               <tr key={b.id}>
-                <td className="p-3">{b.logo_url && <img src={b.logo_url} alt="" className="h-8 w-8 rounded object-contain" />}</td>
+                <td className="p-3"><ImagePreview url={b.logo_url ?? ""} className="h-8 w-8" /></td>
                 <td className="p-3 font-semibold">{b.name}</td>
                 <td className="p-3 text-muted-foreground">{b.slug}</td>
                 <td className="p-3 text-right">
                   <Btn variant="ghost" onClick={()=>{ setEdit(b); setOpen(true); }}>Edit</Btn>
-                  <Btn variant="danger" className="ml-2" onClick={async ()=>{ if(confirm("Delete?")){ await del({ data: { id: b.id } }); toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["adm","brands"] }); } }}>Delete</Btn>
+                  <Btn variant="danger" className="ml-2" onClick={async ()=>{
+                    const ok = await confirmAction({ title: "Delete brand?", message: `${b.name} — this cannot be undone.`, confirmLabel: "Delete", tone: "danger" });
+                    if (!ok) return;
+                    await del({ data: { id: b.id } });
+                    toast.success("Brand deleted successfully");
+                    qc.invalidateQueries({ queryKey: ["adm","brands"] });
+                  }}>Delete</Btn>
                 </td>
               </tr>
             ))}
@@ -53,28 +60,11 @@ function BrandForm({ initial, onSave }: { initial: Brand | null; onSave: (p: { i
   const [name, setN] = useState(initial?.name ?? "");
   const [slug, setS] = useState(initial?.slug ?? "");
   const [logo, setL] = useState(initial?.logo_url ?? "");
-  const [up, setUp] = useState(false);
-  const upload = async (file: File) => {
-    setUp(true);
-    try {
-      const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g,"_")}`;
-      const { error } = await supabase.storage.from("brand-logos").upload(path, file, { upsert: false });
-      if (error) throw error;
-      const { data } = supabase.storage.from("brand-logos").getPublicUrl(path);
-      setL(data.publicUrl);
-    } catch(e){ toast.error((e as Error).message); } finally { setUp(false); }
-  };
   return (
     <form onSubmit={(e)=>{ e.preventDefault(); onSave({ id: initial?.id, name, slug, logo_url: logo || null }); }} className="grid gap-3">
       <Field label="Name"><Input value={name} onChange={(e)=>setN(e.target.value)} required /></Field>
       <Field label="Slug"><Input value={slug} onChange={(e)=>setS(e.target.value)} required /></Field>
-      <Field label="Logo">
-        <div className="flex items-center gap-3">
-          {logo && <img src={logo} alt="" className="h-12 w-12 rounded object-contain bg-secondary p-1" />}
-          <Input type="file" accept="image/*" onChange={(e)=>{ const f=e.target.files?.[0]; if(f) upload(f); }} disabled={up} />
-        </div>
-      </Field>
-      <Field label="Logo URL"><Input value={logo} onChange={(e)=>setL(e.target.value)} /></Field>
+      <ImageUrlField label="Logo" bucket="brand-logos" hint="Upload from computer or paste any logo URL (long URLs welcome)." value={logo} onChange={setL} />
       <div className="flex justify-end"><Btn type="submit">Save</Btn></div>
     </form>
   );
