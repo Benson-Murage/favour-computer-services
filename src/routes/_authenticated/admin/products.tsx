@@ -5,8 +5,9 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Field, Input, Label, Modal, Select, Textarea, StatusPill } from "@/components/admin/ui";
+import { ImagePreview, ImageUrlField } from "@/components/admin/image-input";
+import { confirmAction } from "@/components/admin/confirm";
 import { listAdminProducts, saveProduct, setProductArchived, deleteProduct, listCategoriesAdmin, listBrandsAdmin } from "@/lib/admin-crud.functions";
-import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin/products")({ component: ProductsPage });
@@ -70,7 +71,7 @@ function ProductsPage() {
               <tr key={p.id} className="hover:bg-secondary/40">
                 <td className="p-3">
                   <div className="flex items-center gap-3">
-                    {(ap.image_url as string | null) && <img src={ap.image_url as string} alt="" className="h-10 w-10 rounded object-cover" />}
+                    <ImagePreview url={(ap.image_url as string | null) ?? ""} className="h-10 w-10" />
                     <div>
                       <div className="font-semibold">{p.name}</div>
                       <div className="text-[11px] text-muted-foreground">{p.slug} · {String(ap.condition)}</div>
@@ -94,10 +95,22 @@ function ProductsPage() {
                 <td className="p-3">
                   <div className="flex justify-end gap-1">
                     <Btn variant="ghost" onClick={()=>{ setCreating(false); setEdit(p); }}>Edit</Btn>
-                    <Btn variant="secondary" onClick={async ()=>{ await arch({ data: { id: p.id, archived: !ap.archived_at } }); toast.success(ap.archived_at ? "Restored" : "Archived"); qc.invalidateQueries({ queryKey: ["adm","products"] }); }}>
+                    <Btn variant="secondary" onClick={async ()=>{
+                      const ok = await confirmAction({ title: ap.archived_at ? "Restore product?" : "Archive product?", message: p.name, confirmLabel: ap.archived_at ? "Restore" : "Archive" });
+                      if (!ok) return;
+                      await arch({ data: { id: p.id, archived: !ap.archived_at } });
+                      toast.success(ap.archived_at ? "Product restored" : "Product archived");
+                      qc.invalidateQueries({ queryKey: ["adm","products"] });
+                    }}>
                       {ap.archived_at ? "Restore" : "Archive"}
                     </Btn>
-                    <Btn variant="danger" onClick={async ()=>{ if(confirm("Delete permanently?")) { await del({ data: { id: p.id } }); toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["adm","products"] }); } }}>Delete</Btn>
+                    <Btn variant="danger" onClick={async ()=>{
+                      const ok = await confirmAction({ title: "Delete product permanently?", message: `${p.name} — this cannot be undone.`, confirmLabel: "Delete", tone: "danger" });
+                      if (!ok) return;
+                      await del({ data: { id: p.id } });
+                      toast.success("Product deleted successfully");
+                      qc.invalidateQueries({ queryKey: ["adm","products"] });
+                    }}>Delete</Btn>
                   </div>
                 </td>
               </tr>
@@ -164,20 +177,6 @@ function ProductForm({ initial, categories, brands, onSave }: {
     image_urls: Array.isArray(init.image_urls) ? (init.image_urls as string[]) : [],
   });
   const set = (k: string, v: unknown) => setForm((s) => ({ ...s, [k]: v }));
-  const [uploading, setUploading] = useState(false);
-
-  const upload = async (file: File) => {
-    setUploading(true);
-    try {
-      const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
-      const { error } = await supabase.storage.from("product-images").upload(path, file, { upsert: false });
-      if (error) throw error;
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      set("image_url", data.publicUrl);
-      toast.success("Uploaded");
-    } catch (e) { toast.error((e as Error).message); } finally { setUploading(false); }
-  };
-
   return (
     <form onSubmit={(e)=>{ e.preventDefault(); const payload = { ...form };
       ["compare_at_price","offer_percent","offer_price"].forEach(k => { if (payload[k]==="" || payload[k]==null) delete payload[k]; });
@@ -219,15 +218,13 @@ function ProductForm({ initial, categories, brands, onSave }: {
         <Field label="Processor"><Input value={String(form.processor ?? "")} onChange={(e)=>set("processor", e.target.value)} /></Field>
       </div>
       <Field label="Warranty"><Input value={String(form.warranty ?? "")} onChange={(e)=>set("warranty", e.target.value)} placeholder="e.g. 1 year manufacturer warranty" /></Field>
-      <div>
-        <Label>Image</Label>
-        <div className="mt-1 flex items-center gap-3">
-          {String(form.image_url) && <img src={String(form.image_url)} alt="" className="h-16 w-16 rounded object-cover" />}
-          <Input type="file" accept="image/*" onChange={(e)=>{ const f = e.target.files?.[0]; if (f) upload(f); }} disabled={uploading} />
-          {uploading && <span className="text-xs text-muted-foreground">Uploading…</span>}
-        </div>
-        <Input className="mt-2" placeholder="Or paste image URL" value={String(form.image_url ?? "")} onChange={(e)=>set("image_url", e.target.value)} />
-      </div>
+      <ImageUrlField
+        label="Featured image"
+        bucket="product-images"
+        hint="Upload from your computer or paste any image URL (supplier, CDN, Google, manufacturer). JPG, PNG, WEBP, GIF, AVIF supported."
+        value={String(form.image_url ?? "")}
+        onChange={(v) => set("image_url", v)}
+      />
       <ImageUrlList
         urls={(form.image_urls as string[]) ?? []}
         featured={String(form.image_url ?? "")}
@@ -282,15 +279,15 @@ function ImageUrlList({ urls, featured, onChange, onFeature }: {
       <Label>Additional image URLs</Label>
       <p className="mt-1 text-[11px] text-muted-foreground">Paste image links from manufacturer, supplier, CDN, or hosting sites. Set any as the featured image.</p>
       <div className="mt-2 flex gap-2">
-        <Input value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder="https://example.com/product.jpg" />
+        <Input value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder="https://example.com/very-long-cdn-image-url.jpg" />
         <Btn variant="secondary" onClick={add}>Add</Btn>
       </div>
       {urls.length > 0 && (
         <ul className="mt-3 grid gap-2">
           {urls.map((u, i) => (
             <li key={u} className="flex items-center gap-3 rounded-lg border border-border bg-card p-2">
-              <img src={u} alt="" className="h-10 w-10 rounded object-cover" />
-              <span className="flex-1 truncate text-xs">{u}</span>
+              <ImagePreview url={u} className="h-10 w-10" />
+              <span className="flex-1 truncate text-xs" title={u}>{u}</span>
               {featured === u
                 ? <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase text-background">Featured</span>
                 : <Btn variant="ghost" onClick={()=>onFeature(u)}>Set featured</Btn>}
