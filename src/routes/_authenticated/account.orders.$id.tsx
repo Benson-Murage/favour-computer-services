@@ -68,7 +68,7 @@ function OrderDetail() {
         if (upErr) throw upErr;
       }
       const finalRef = note.trim() ? `${reference}${reference && note ? " — " : ""}${note}` : reference;
-      await submitProof({ data: { order_id: order.id, amount, method, reference: finalRef, proof_path, proof_mime } });
+      await submitProof({ data: { order_id: order.id, amount, method, reference: finalRef, proof_path: proof_path ?? "", proof_mime: proof_mime ?? "" } });
       toast.success("Payment proof submitted — we'll verify shortly");
       await reload();
     } catch (e) { toast.error((e as Error).message); }
