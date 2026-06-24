@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Field, Input, Modal } from "@/components/admin/ui";
+import { confirmAction } from "@/components/admin/confirm";
 import { listCategoriesAdmin, saveCategory, deleteCategory } from "@/lib/admin-crud.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/categories")({ component: CategoriesPage });
@@ -35,7 +36,13 @@ function CategoriesPage() {
                 <td className="p-3">{c.sort_order ?? 0}</td>
                 <td className="p-3 text-right">
                   <Btn variant="ghost" onClick={()=>{ setEdit(c); setOpen(true); }}>Edit</Btn>
-                  <Btn variant="danger" className="ml-2" onClick={async ()=>{ if(confirm("Delete?")){ await del({ data: { id: c.id } }); toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["adm","cats"] }); } }}>Delete</Btn>
+                  <Btn variant="danger" className="ml-2" onClick={async ()=>{
+                    const ok = await confirmAction({ title: "Delete category?", message: `${c.name} — products in this category will be uncategorized.`, confirmLabel: "Delete", tone: "danger" });
+                    if (!ok) return;
+                    await del({ data: { id: c.id } });
+                    toast.success("Category deleted successfully");
+                    qc.invalidateQueries({ queryKey: ["adm","cats"] });
+                  }}>Delete</Btn>
                 </td>
               </tr>
             ))}

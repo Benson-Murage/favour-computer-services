@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Modal, StatusPill, Textarea } from "@/components/admin/ui";
+import { confirmAction } from "@/components/admin/confirm";
 import { adminListPayments, adminReviewPayment, getProofSignedUrl } from "@/lib/payments.functions";
 import { formatPrice } from "@/lib/format";
 
@@ -31,8 +32,17 @@ function PaymentsAdmin() {
   };
   const act = async (action: "approve"|"reject") => {
     if (!open) return;
+    const ok = await confirmAction({
+      title: action === "approve" ? "Approve this payment?" : "Reject this payment?",
+      message: action === "approve"
+        ? "The order will be marked as paid and the customer will be notified."
+        : "The customer will be notified to resubmit proof.",
+      confirmLabel: action === "approve" ? "Approve & mark paid" : "Reject payment",
+      tone: action === "reject" ? "danger" : "primary",
+    });
+    if (!ok) return;
     await review({ data: { id: open.id, action, notes } });
-    toast.success(action === "approve" ? "Payment approved" : "Payment rejected");
+    toast.success(action === "approve" ? "Payment approved successfully" : "Payment rejected");
     setOpen(null);
     qc.invalidateQueries({ queryKey: ["adm","payments"] });
   };
