@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Input, Select, StatusPill } from "@/components/admin/ui";
+import { confirmAction } from "@/components/admin/confirm";
 import { listUsers, setUserRole, setUserDisabled, sendPasswordReset, forceSignOut } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({ component: UsersPage });
@@ -77,8 +78,16 @@ function UsersPage() {
                     <Btn variant="ghost" onClick={()=>wrap(()=>reset({ data: { email: u.email, redirect_to: typeof window !== "undefined" ? `${window.location.origin}/reset-password` : undefined } }), "Reset link queued")}>Reset password</Btn>
                     <Btn variant="ghost" onClick={()=>wrap(()=>signOut({ data: { user_id: u.id } }), "User signed out")}>Force sign-out</Btn>
                     {u.disabled
-                      ? <Btn variant="secondary" onClick={()=>wrap(()=>setDis({ data: { user_id: u.id, disabled: false } }), "Enabled")}>Enable</Btn>
-                      : <Btn variant="danger" onClick={()=>{ if(confirm(`Disable ${u.email}?`)) wrap(()=>setDis({ data: { user_id: u.id, disabled: true } }), "Disabled"); }}>Disable</Btn>}
+                      ? <Btn variant="secondary" onClick={async ()=>{
+                          const ok = await confirmAction({ title: "Enable user?", message: u.email });
+                          if (!ok) return;
+                          wrap(()=>setDis({ data: { user_id: u.id, disabled: false } }), "User enabled successfully");
+                        }}>Enable</Btn>
+                      : <Btn variant="danger" onClick={async ()=>{
+                          const ok = await confirmAction({ title: "Disable this user?", message: `${u.email} will be blocked from signing in.`, confirmLabel: "Disable", tone: "danger" });
+                          if (!ok) return;
+                          wrap(()=>setDis({ data: { user_id: u.id, disabled: true } }), "User disabled successfully");
+                        }}>Disable</Btn>}
                   </div>
                 </td>
               </tr>
