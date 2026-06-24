@@ -27,9 +27,9 @@ const ProductInput = z.object({
   condition: z.enum(["new", "refurbished"]).default("new"),
   category_id: z.string().uuid().optional().nullable(),
   brand_id: z.string().uuid().optional().nullable(),
-  image_url: z.string().max(1000).optional().nullable(),
+  image_url: z.string().max(20000).optional().nullable(),
   images: z.array(z.string()).optional().default([]),
-  image_urls: z.array(z.string()).optional().default([]),
+  image_urls: z.array(z.string().max(20000)).optional().default([]),
   stock: z.coerce.number().int().min(0).default(0),
   warranty: z.string().max(400).optional().default(""),
   ram: z.string().max(80).optional().nullable(),
@@ -160,7 +160,7 @@ const BrandInput = z.object({
   id: z.string().uuid().optional(),
   slug: z.string().trim().min(1).max(120),
   name: z.string().trim().min(1).max(120),
-  logo_url: z.string().max(1000).optional().nullable(),
+  logo_url: z.string().max(20000).optional().nullable(),
   sort_order: z.coerce.number().int().optional().default(0),
 });
 
