@@ -161,3 +161,8 @@
     background: var(--color-secondary);
   }
 }
+
+@media print {
+  header, footer, .print\:hidden { display: none !important; }
+  body { background: white !important; color: black !important; }
+}
