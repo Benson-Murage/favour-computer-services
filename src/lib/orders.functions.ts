@@ -20,6 +20,9 @@ const OrderInput = z.object({
   fulfillment: z.enum(["delivery", "pickup"]),
   delivery_address: z.string().optional().default(""),
   notes: z.string().optional().default(""),
+  delivery_lat: z.number().finite().nullable().optional(),
+  delivery_lng: z.number().finite().nullable().optional(),
+  delivery_note: z.string().max(500).optional().default(""),
   items: z.array(ItemSchema).min(1),
 });
 
@@ -57,6 +60,9 @@ export const placeOrder = createServerFn({ method: "POST" })
         customer_phone: data.customer_phone,
         fulfillment: data.fulfillment,
         delivery_address: data.delivery_address ?? "",
+        delivery_lat: data.delivery_lat ?? null,
+        delivery_lng: data.delivery_lng ?? null,
+        delivery_note: data.delivery_note ?? "",
         items: data.items as never,
         subtotal,
         total,
