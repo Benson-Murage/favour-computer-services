@@ -11,6 +11,8 @@ import { useBusinessSettings } from "@/lib/use-business-settings";
 import { downloadReceiptPdf, printReceiptPdf, type ReceiptOrder } from "@/lib/receipt";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { StaticMapPreview } from "@/components/location-picker";
+import { PaymentCard } from "@/components/payment-card";
 
 export const Route = createFileRoute("/_authenticated/account/orders/$id")({
   head: () => ({ meta: [{ title: "Order — Favour Computer Services" }] }),
@@ -53,6 +55,10 @@ function OrderDetail() {
     till_number: settings?.till_number, paybill_number: settings?.paybill_number, account_number: settings?.account_number,
   };
 
+  const pinLat = (order as unknown as { delivery_lat?: number | null }).delivery_lat ?? null;
+  const pinLng = (order as unknown as { delivery_lng?: number | null }).delivery_lng ?? null;
+  const pinNote = (order as unknown as { delivery_note?: string | null }).delivery_note ?? "";
+
   const submit = async (file: File | null, amount: number, method: string, reference: string, note: string) => {
     if (!user) return;
     if (!file && !reference.trim()) { toast.error("Add a transaction code OR upload a screenshot"); return; }
@@ -91,9 +97,12 @@ function OrderDetail() {
           <p className="mt-1 text-sm text-muted-foreground">Placed {new Date(order.created_at).toLocaleString("en-KE")}</p>
         </div>
         <div className="flex gap-2">
-          <Btn variant="secondary" onClick={() => printReceiptPdf(receipt, biz)}><Printer className="mr-1 h-3.5 w-3.5" />Print</Btn>
-          <Btn variant="secondary" onClick={() => downloadReceiptPdf(receipt, biz, "invoice")}><FileText className="mr-1 h-3.5 w-3.5" />Invoice</Btn>
-          <Btn onClick={() => downloadReceiptPdf(receipt, biz, "receipt")}><Download className="mr-1 h-3.5 w-3.5" />Receipt</Btn>
+          <Btn variant="secondary" onClick={() => { void printReceiptPdf(receipt, biz); }}><Printer className="mr-1 h-3.5 w-3.5" />Print</Btn>
+          <Btn variant="secondary" onClick={() => { void downloadReceiptPdf(receipt, biz, "invoice"); }}><FileText className="mr-1 h-3.5 w-3.5" />Invoice</Btn>
+          <Btn onClick={() => { void downloadReceiptPdf(receipt, biz, "receipt"); }}><Download className="mr-1 h-3.5 w-3.5" />Receipt</Btn>
+          <Link to="/receipts/$id" params={{ id: order.id }} className="inline-flex h-9 items-center rounded-full border border-border bg-card px-3 text-xs font-semibold hover:bg-secondary">
+            View receipt
+          </Link>
         </div>
       </div>
 
@@ -141,6 +150,28 @@ function OrderDetail() {
             </div>
           )}
 
+          {order.fulfillment === "delivery" && (
+            <div className="rounded-2xl border border-border bg-card p-5 text-sm">
+              <h3 className="text-sm font-bold">Delivery location</h3>
+              {order.delivery_address && <div className="mt-2 text-muted-foreground">{order.delivery_address}</div>}
+              {pinNote && <div className="mt-1 text-xs text-muted-foreground">Note: {pinNote}</div>}
+              {pinLat != null && pinLng != null && (
+                <div className="mt-3">
+                  <StaticMapPreview lat={pinLat} lng={pinLng} address={order.delivery_address ?? undefined} height={200} />
+                </div>
+              )}
+            </div>
+          )}
+
+          <PaymentCard
+            tillNumber={settings?.till_number}
+            paybillNumber={settings?.paybill_number}
+            accountNumber={settings?.account_number}
+            instructions={settings?.payment_instructions}
+            amount={Number(order.total)}
+            compact
+          />
+
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="text-sm font-bold">Pay & upload proof</h3>
             <div className="mt-3 flex gap-2 rounded-xl bg-secondary/60 p-3 text-xs">
@@ -149,11 +180,6 @@ function OrderDetail() {
                 Upload your payment screenshot or proof of payment <strong>directly here</strong>.
                 You can also just paste the M-Pesa transaction code — no file required.
               </p>
-            </div>
-            <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-              {settings?.till_number && <div>M-Pesa Till: <span className="font-mono font-semibold text-foreground">{settings.till_number}</span></div>}
-              {settings?.paybill_number && <div>M-Pesa Paybill: <span className="font-mono font-semibold text-foreground">{settings.paybill_number}</span>{settings.account_number ? ` · Account ${settings.account_number}` : ""}</div>}
-              {settings?.payment_instructions && <p className="mt-1">{settings.payment_instructions}</p>}
             </div>
 
             <form className="mt-4 space-y-2" onSubmit={async (e) => {
