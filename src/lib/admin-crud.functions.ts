@@ -371,3 +371,15 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const adminGetOrder = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { data: order, error } = await context.supabase.from("orders").select("*").eq("id", data.id).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!order) throw new Error("Order not found");
+    const { data: payments } = await context.supabase.from("payments").select("*").eq("order_id", data.id).order("created_at", { ascending: false });
+    return { order, payments: payments ?? [] };
+  });

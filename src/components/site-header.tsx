@@ -1,8 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Heart, Search, ShoppingBag, User, Cpu, Menu, X, Phone, MapPin } from "lucide-react";
+import { Heart, Search, ShoppingBag, User, Menu, X, Phone, MapPin } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type NavItem = { label: string; to: string; search?: Record<string, string> };
 const NAV: NavItem[] = [
@@ -59,15 +61,7 @@ export function SiteHeader() {
       </div>
 
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-foreground text-background">
-            <Cpu className="h-5 w-5" strokeWidth={2.5} />
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="text-base font-bold tracking-tight">Favour Computer</span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Services · Nairobi</span>
-          </span>
-        </Link>
+        <Logo size="md" showWordmark />
 
         <form
           onSubmit={(e) => {
@@ -88,6 +82,7 @@ export function SiteHeader() {
         </form>
 
         <nav className="ml-auto flex items-center gap-1">
+          <ThemeToggle className="hidden md:inline-flex" />
           <Link
             to="/wishlist"
             className="hidden h-10 w-10 place-items-center rounded-full text-foreground transition hover:bg-secondary md:grid"

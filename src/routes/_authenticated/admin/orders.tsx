@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -34,6 +34,8 @@ function OrdersPage() {
                 <td className="p-3">{formatPrice(Number(o.total))}</td>
                 <td className="p-3"><StatusPill tone={o.status==="cancelled"?"danger":o.status==="delivered"||o.status==="picked_up"?"success":"info"}>{o.status}</StatusPill></td>
                 <td className="p-3">
+                  <div className="flex items-center gap-2">
+                  <Link to="/receipts/$id" params={{ id: o.id }} className="rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-semibold hover:bg-secondary">Receipt</Link>
                   <Select value={o.status} onChange={async (e)=>{
                     const next = e.target.value as typeof STATUSES[number];
                     const labels: Record<string,string> = { paid: "PAID", ready: "READY FOR PICKUP", picked_up: "PICKED UP", delivered: "DELIVERED", cancelled: "CANCELLED", pending: "PENDING" };
@@ -50,6 +52,7 @@ function OrdersPage() {
                   }}>
                     {STATUSES.map((s)=><option key={s} value={s}>{s}</option>)}
                   </Select>
+                  </div>
                 </td>
               </tr>
             ))}

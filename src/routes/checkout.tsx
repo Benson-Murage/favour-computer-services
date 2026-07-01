@@ -8,6 +8,8 @@ import { formatPrice } from "@/lib/format";
 import { Btn, Field, Input, Textarea } from "@/components/admin/ui";
 import { useBusinessSettings } from "@/lib/use-business-settings";
 import { placeOrder } from "@/lib/orders.functions";
+import { LocationPicker, type PickedLocation } from "@/components/location-picker";
+import { PaymentCard } from "@/components/payment-card";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Favour Computer Services" }, { name: "description", content: "Place your order — delivery or store pickup in Nairobi." }] }),
@@ -22,6 +24,7 @@ function CheckoutPage() {
   const [method, setMethod] = useState<"delivery" | "pickup">("delivery");
   const [done, setDone] = useState<{ id: string; reservation_number: string | null; pickup_code: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pin, setPin] = useState<PickedLocation | null>(null);
 
   if (items.length === 0 && !done) {
     return (
@@ -52,14 +55,15 @@ function CheckoutPage() {
               <p className="mt-3 text-xs text-muted-foreground">Bring this code when collecting your order.</p>
             </div>
           )}
-          {(settings?.till_number || settings?.paybill_number) && (
-            <div className="mx-auto mt-4 max-w-md rounded-2xl border border-dashed border-border p-5 text-left text-sm">
-              <div className="text-xs font-bold uppercase text-muted-foreground">Payment</div>
-              {settings?.till_number && <div className="mt-1">M-Pesa Till: <span className="font-mono font-bold">{settings.till_number}</span></div>}
-              {settings?.paybill_number && <div>M-Pesa Paybill: <span className="font-mono font-bold">{settings.paybill_number}</span>{settings.account_number ? ` · Account: ${settings.account_number}` : ""}</div>}
-              {settings?.payment_instructions && <p className="mt-2 text-xs text-muted-foreground">{settings.payment_instructions}</p>}
-            </div>
-          )}
+          <div className="mt-6 text-left">
+            <PaymentCard
+              tillNumber={settings?.till_number}
+              paybillNumber={settings?.paybill_number}
+              accountNumber={settings?.account_number}
+              instructions={settings?.payment_instructions}
+              amount={subtotal}
+            />
+          </div>
           <div className="mt-6 flex justify-center gap-3">
             <button onClick={()=>{ clear(); nav({ to: "/shop" }); }} className="inline-flex h-10 items-center rounded-full bg-foreground px-5 text-sm font-semibold text-background">Continue shopping</button>
             <Link to="/account/orders/$id" params={{ id: done.id }} className="inline-flex h-10 items-center rounded-full border border-border bg-card px-5 text-sm font-semibold">
@@ -76,6 +80,10 @@ function CheckoutPage() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    if (method === "delivery" && !pin) {
+      toast.error("Please pin your delivery location on the map or use current location");
+      return;
+    }
     setBusy(true);
     try {
       const res = await submit({ data: {
@@ -83,7 +91,10 @@ function CheckoutPage() {
         customer_email: String(fd.get("email") ?? ""),
         customer_phone: String(fd.get("phone") ?? ""),
         fulfillment: method,
-        delivery_address: String(fd.get("address") ?? ""),
+        delivery_address: method === "delivery" ? (pin?.address ?? "") : "",
+        delivery_lat: method === "delivery" ? pin?.lat ?? null : null,
+        delivery_lng: method === "delivery" ? pin?.lng ?? null : null,
+        delivery_note: method === "delivery" ? String(fd.get("delivery_note") ?? "") : "",
         notes: String(fd.get("notes") ?? ""),
         items: items.map((i) => ({ product_id: i.id, name: i.name, price: Number(i.price), qty: i.qty })),
       }});
@@ -120,21 +131,29 @@ function CheckoutPage() {
             </div>
             <div className="mt-3"><Field label="Email"><Input name="email" type="email" required /></Field></div>
             {method === "delivery" && (
-              <div className="mt-3"><Field label="Delivery address"><Textarea name="address" rows={2} required={method==="delivery"} /></Field></div>
+              <div className="mt-4 space-y-3">
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Delivery location</div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Tap <strong>Use current location</strong> or drop a pin on the map. We use the pin to plan your delivery — no need to type your address.
+                  </p>
+                </div>
+                <LocationPicker value={pin} onChange={setPin} height={300} />
+                <Field label="Apartment / building / house description (optional)">
+                  <Textarea name="delivery_note" rows={2} placeholder="e.g. Kileleshwa, Apt 4B, gate opposite the shop" />
+                </Field>
+              </div>
             )}
             <div className="mt-3"><Field label="Notes (optional)"><Textarea name="notes" rows={2} /></Field></div>
           </section>
 
-          {(settings?.till_number || settings?.paybill_number) && (
-            <section className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="text-base font-bold">Payment</h2>
-              <div className="mt-3 text-sm">
-                {settings?.till_number && <div>M-Pesa Till: <span className="font-mono font-bold">{settings.till_number}</span></div>}
-                {settings?.paybill_number && <div>M-Pesa Paybill: <span className="font-mono font-bold">{settings.paybill_number}</span>{settings.account_number ? ` · Account ${settings.account_number}` : ""}</div>}
-                {settings?.payment_instructions && <p className="mt-2 text-xs text-muted-foreground">{settings.payment_instructions}</p>}
-              </div>
-            </section>
-          )}
+          <PaymentCard
+            tillNumber={settings?.till_number}
+            paybillNumber={settings?.paybill_number}
+            accountNumber={settings?.account_number}
+            instructions={settings?.payment_instructions}
+            amount={subtotal}
+          />
 
           <Btn type="submit" disabled={busy} className="!h-12 !px-8 !text-sm">{busy ? "Placing order…" : "Place order"}</Btn>
         </form>

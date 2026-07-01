@@ -1,4 +1,32 @@
 import jsPDF from "jspdf";
+import logoAsset from "@/assets/fcs-logo.png.asset.json";
+
+let LOGO_DATA_URL: string | null = null;
+let LOGO_DIMS: { w: number; h: number } | null = null;
+async function loadLogo() {
+  if (LOGO_DATA_URL) return { url: LOGO_DATA_URL, dims: LOGO_DIMS! };
+  try {
+    const res = await fetch(logoAsset.url);
+    const blob = await res.blob();
+    const dataUrl: string = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(blob);
+    });
+    const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.width, h: img.height });
+      img.onerror = () => resolve({ w: 1024, h: 1024 });
+      img.src = dataUrl;
+    });
+    LOGO_DATA_URL = dataUrl;
+    LOGO_DIMS = dims;
+    return { url: dataUrl, dims };
+  } catch {
+    return null;
+  }
+}
 
 export type ReceiptOrder = {
   invoice_number: string | null;
@@ -30,21 +58,31 @@ export type BusinessInfo = {
 
 const KES = (n: number) => "KES " + Number(n || 0).toLocaleString("en-KE", { minimumFractionDigits: 0 });
 
-export function generateReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind: "receipt" | "invoice" = "receipt") {
+export async function generateReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind: "receipt" | "invoice" = "receipt") {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   let y = 50;
 
+  const logo = await loadLogo();
+  let headerLeft = 50;
+  if (logo) {
+    const targetH = 46;
+    const ratio = logo.dims.w / logo.dims.h;
+    const targetW = targetH * ratio;
+    try { doc.addImage(logo.url, "PNG", 50, y - 20, targetW, targetH); } catch { /* empty */ }
+    headerLeft = 50 + targetW + 12;
+  }
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(biz.name ?? "Favour Computer Services", 50, y);
+  doc.setFontSize(16);
+  doc.text(biz.name ?? "Favour Computer Services", headerLeft, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(110);
   y += 16;
-  if (biz.address) { doc.text(biz.address, 50, y); y += 12; }
-  if (biz.phone) { doc.text(`Tel: ${biz.phone}`, 50, y); y += 12; }
-  if (biz.email) { doc.text(biz.email, 50, y); y += 12; }
+  if (biz.address) { doc.text(biz.address, headerLeft, y); y += 12; }
+  if (biz.phone) { doc.text(`Tel: ${biz.phone}`, headerLeft, y); y += 12; }
+  if (biz.email) { doc.text(biz.email, headerLeft, y); y += 12; }
+  y = Math.max(y, 90);
 
   doc.setTextColor(20);
   doc.setFont("helvetica", "bold");
@@ -124,13 +162,13 @@ export function generateReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind:
   return doc;
 }
 
-export function downloadReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind: "receipt" | "invoice" = "receipt") {
-  const doc = generateReceiptPdf(order, biz, kind);
+export async function downloadReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind: "receipt" | "invoice" = "receipt") {
+  const doc = await generateReceiptPdf(order, biz, kind);
   doc.save(`${kind}-${order.invoice_number ?? order.id.slice(0, 8)}.pdf`);
 }
 
-export function printReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind: "receipt" | "invoice" = "receipt") {
-  const doc = generateReceiptPdf(order, biz, kind);
+export async function printReceiptPdf(order: ReceiptOrder, biz: BusinessInfo, kind: "receipt" | "invoice" = "receipt") {
+  const doc = await generateReceiptPdf(order, biz, kind);
   const blob = doc.output("bloburl") as unknown as string;
   window.open(blob, "_blank");
 }

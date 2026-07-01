@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
+import logoAsset from "@/assets/fcs-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Voltline" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Favour Computer Services" }] }),
   component: Auth,
 });
 
@@ -45,12 +45,12 @@ function Auth() {
   return (
     <div className="mx-auto grid min-h-[calc(100vh-12rem)] max-w-md place-items-center px-4 py-12">
       <div className="w-full rounded-3xl border border-border bg-card p-8 [box-shadow:var(--shadow-elevated)]">
-        <div className="flex flex-col items-center gap-2">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-foreground text-background">
-            <Zap className="h-6 w-6" strokeWidth={2.5} />
-          </span>
+        <div className="flex flex-col items-center gap-3">
+          <img src={logoAsset.url} alt="Favour Computer Services" className="h-16 w-auto object-contain" />
           <h1 className="text-2xl font-bold tracking-tight">{mode === "signin" ? "Welcome back" : "Create your account"}</h1>
-          <p className="text-sm text-muted-foreground">{mode === "signin" ? "Sign in to your Voltline account" : "Join Voltline in seconds"}</p>
+          <p className="text-center text-sm text-muted-foreground">
+            {mode === "signin" ? "Sign in to your Favour Computer Services account" : "Join Favour Computer Services in seconds"}
+          </p>
         </div>
 
         <button
@@ -88,7 +88,7 @@ function Auth() {
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
           className="mt-5 w-full text-center text-sm text-muted-foreground hover:text-foreground"
         >
-          {mode === "signin" ? "New to Voltline? Create an account" : "Already have an account? Sign in"}
+          {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
         </button>
       </div>
     </div>

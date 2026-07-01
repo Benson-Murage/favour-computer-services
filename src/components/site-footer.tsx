@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Cpu, Phone, Mail, MapPin, Facebook, Instagram, Linkedin, Youtube, Twitter, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin, Youtube, Twitter, MessageCircle } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { useBusinessSettings } from "@/lib/use-business-settings";
+import logoAsset from "@/assets/fcs-logo.png.asset.json";
 
 export function SiteFooter() {
   const s = useBusinessSettings();
@@ -23,9 +24,9 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-border bg-foreground text-background">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-background text-foreground">
-              <Cpu className="h-5 w-5" strokeWidth={2.5} />
+          <Link to="/" className="inline-flex items-center gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-background p-1.5">
+              <img src={logoAsset.url} alt={name} className="h-full w-full object-contain" />
             </span>
             <span className="text-lg font-bold tracking-tight">{name}</span>
           </Link>

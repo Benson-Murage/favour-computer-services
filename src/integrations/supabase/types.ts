@@ -416,6 +416,9 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_address: string | null
+          delivery_lat: number | null
+          delivery_lng: number | null
+          delivery_note: string | null
           fulfillment: Database["public"]["Enums"]["fulfillment_method"]
           id: string
           invoice_number: string | null
@@ -436,6 +439,9 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_address?: string | null
+          delivery_lat?: number | null
+          delivery_lng?: number | null
+          delivery_note?: string | null
           fulfillment?: Database["public"]["Enums"]["fulfillment_method"]
           id?: string
           invoice_number?: string | null
@@ -456,6 +462,9 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           delivery_address?: string | null
+          delivery_lat?: number | null
+          delivery_lng?: number | null
+          delivery_note?: string | null
           fulfillment?: Database["public"]["Enums"]["fulfillment_method"]
           id?: string
           invoice_number?: string | null

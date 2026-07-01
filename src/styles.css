@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -146,5 +147,22 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+
+  /* Leaflet tiles respect current theme */
+  .dark .leaflet-tile {
+    filter: brightness(0.85) contrast(1.05) saturate(0.9);
+  }
+  .leaflet-container {
+    font-family: inherit;
+    background: var(--color-secondary);
+  }
+}
+
+@media print {
+  header, footer, .print\:hidden { display: none !important; }
+  body { background: white !important; color: black !important; }
 }
