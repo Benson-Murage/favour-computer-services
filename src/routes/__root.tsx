@@ -16,6 +16,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider, themeInitScript } from "@/lib/theme";
+import logoAsset from "@/assets/fcs-logo.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -90,14 +92,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
       { name: "twitter:description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9b7a86aa-6fb1-4a9e-8345-94ec87503610/id-preview-f401d527--bcb2bc46-96c9-483f-bb89-ce1696c4b248.lovable.app-1781862440193.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9b7a86aa-6fb1-4a9e-8345-94ec87503610/id-preview-f401d527--bcb2bc46-96c9-483f-bb89-ce1696c4b248.lovable.app-1781862440193.png" },
+      { property: "og:image", content: logoAsset.url },
+      { name: "twitter:image", content: logoAsset.url },
+      { name: "theme-color", content: "#0b1220" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/png", href: logoAsset.url },
+      { rel: "apple-touch-icon", href: logoAsset.url },
+      { rel: "shortcut icon", href: logoAsset.url },
     ],
   }),
   shellComponent: RootShell,
@@ -108,8 +114,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <HeadContent />
       </head>
       <body>
@@ -125,18 +132,20 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <SiteFooter />
-          </div>
-          <Toaster />
-        </CartProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <div className="flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <SiteFooter />
+            </div>
+            <Toaster />
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
