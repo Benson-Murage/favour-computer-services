@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -23,19 +23,54 @@ type Data = Awaited<ReturnType<typeof getMyOrder>>;
 
 function OrderDetail() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const fetchOrder = useServerFn(getMyOrder);
   const submitProof = useServerFn(submitPaymentProof);
   const signFn = useServerFn(getProofSignedUrl);
   const settings = useBusinessSettings();
   const { user } = useAuth();
   const [data, setData] = useState<Data | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [busy, setBusy] = useState(false);
   const [proofUrls, setProofUrls] = useState<Record<string, string>>({});
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const reload = () => fetchOrder({ data: { id } }).then(setData).catch((e) => toast.error((e as Error).message));
+  const reload = () =>
+    fetchOrder({ data: { id } })
+      .then((r) => { setData(r); setNotFound(false); })
+      .catch((e) => {
+        const msg = (e as Error).message ?? "";
+        if (/not found|no rows|permission|Invalid uuid/i.test(msg)) { setNotFound(true); }
+        else { toast.error(msg || "Failed to load order"); }
+      });
   useEffect(() => { void reload(); /* eslint-disable-line */ }, [id]);
 
+  // Auto-refresh so admin updates (status/payment) reflect on the customer view.
+  useEffect(() => {
+    const t = setInterval(() => { void reload(); }, 15000);
+    const onFocus = () => { void reload(); };
+    window.addEventListener("focus", onFocus);
+    return () => { clearInterval(t); window.removeEventListener("focus", onFocus); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  if (notFound) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary">
+          <Info className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <h1 className="mt-4 text-2xl font-bold tracking-tight">Order not found</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          We couldn't find this order under your account. It may belong to a different email, or the link may be incorrect.
+        </p>
+        <div className="mt-6 flex justify-center gap-2">
+          <Btn variant="secondary" onClick={() => navigate({ to: "/account/orders" })}>Back to My Orders</Btn>
+          <Btn onClick={() => navigate({ to: "/shop" })}>Continue shopping</Btn>
+        </div>
+      </div>
+    );
+  }
   if (!data) return <div className="py-20 text-center text-sm text-muted-foreground">Loading…</div>;
   const { order, payments, notifications } = data;
   const items = (Array.isArray(order.items) ? order.items : []) as Array<{ name: string; qty: number; price: number }>;
