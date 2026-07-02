@@ -92,7 +92,16 @@ function QuotesPage() {
               <Textarea rows={4} defaultValue={open.internal_notes ?? ""} onBlur={async (e)=>{ await upd({ data: { id: open.id, internal_notes: e.target.value } }); toast.success("Note saved"); }} />
             </div>
             <div className="flex gap-2">
-              <a href={`mailto:${open.email}`} className="inline-flex h-9 items-center rounded-full bg-foreground px-4 text-xs font-semibold text-background">Email</a>
+              <a
+                href={`mailto:${open.email}?subject=${encodeURIComponent(`Re: Your quote request${open.package ? ` — ${open.package}` : ""}`)}&body=${encodeURIComponent(`Hi ${open.name},\n\nThank you for contacting Favour Computer Services regarding your request.\n\n`)}`}
+                onClick={() => { toast.success("Opening your email client…"); void navigator.clipboard?.writeText(open.email).catch(() => {}); }}
+                className="inline-flex h-9 items-center rounded-full bg-foreground px-4 text-xs font-semibold text-background hover:opacity-90"
+              >Email</a>
+              <button
+                type="button"
+                onClick={() => { void navigator.clipboard?.writeText(open.email).then(() => toast.success("Email copied to clipboard")).catch(() => toast.error("Copy failed")); }}
+                className="inline-flex h-9 items-center rounded-full border border-border bg-card px-4 text-xs font-semibold hover:bg-secondary"
+              >Copy email</button>
               <a href={`https://wa.me/${open.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center rounded-full bg-[color:var(--accent)] px-4 text-xs font-semibold text-accent-foreground">WhatsApp</a>
             </div>
           </div>
