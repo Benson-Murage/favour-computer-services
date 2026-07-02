@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Tags, Building2, Boxes, MessageSquare, CalendarCheck2, Store, Megaphone, Settings, ScrollText, ShoppingCart, Wallet, Mail, Newspaper, Users } from "lucide-react";
+import { LayoutDashboard, Package, Tags, Building2, Boxes, MessageSquare, CalendarCheck2, Store, Megaphone, Settings, ScrollText, ShoppingCart, Wallet, Mail, Newspaper, Users, Receipt } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/fcs-logo.png.asset.json";
@@ -14,6 +14,7 @@ const NAV: NavEntry[] = [
   { to: "/admin/inventory", label: "Inventory", Icon: Boxes },
   { to: "/admin/orders", label: "Orders", Icon: ShoppingCart },
   { to: "/admin/payments", label: "Payments", Icon: Wallet },
+  { to: "/admin/receipts", label: "Receipts", Icon: Receipt },
   { to: "/admin/pickups", label: "Pickups", Icon: Store },
   { to: "/admin/quotes", label: "Quotes", Icon: MessageSquare },
   { to: "/admin/bookings", label: "Bookings", Icon: CalendarCheck2 },
