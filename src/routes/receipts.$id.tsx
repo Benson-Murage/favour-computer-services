@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowLeft, Download, Printer, FileText, CheckCircle2, Clock, XCircle } from "lucide-react";
@@ -46,24 +46,32 @@ function ReceiptPreview() {
   const [payments, setPayments] = useState<Array<{ status: string; amount: number; method: string | null; reference: string | null; created_at: string }>>([]);
   const [kind, setKind] = useState<"receipt" | "invoice">("receipt");
 
-  useEffect(() => {
-    (async () => {
+  const load = useCallback(async (silent = false) => {
+    try {
+      const d = await getMine({ data: { id } });
+      setOrder(d.order as unknown as OrderShape);
+      setPayments(d.payments as never);
+    } catch {
       try {
-        const d = await getMine({ data: { id } });
+        const d = await getAdmin({ data: { id } });
         setOrder(d.order as unknown as OrderShape);
         setPayments(d.payments as never);
-      } catch {
-        try {
-          const d = await getAdmin({ data: { id } });
-          setOrder(d.order as unknown as OrderShape);
-          setPayments(d.payments as never);
-        } catch (e) {
+      } catch (e) {
+        if (!silent) {
           toast.error((e as Error).message);
           nav({ to: "/" });
         }
       }
-    })();
+    }
   }, [id, getMine, getAdmin, nav]);
+
+  useEffect(() => {
+    void load();
+    const interval = window.setInterval(() => void load(true), 15000);
+    const onFocus = () => void load(true);
+    window.addEventListener("focus", onFocus);
+    return () => { window.clearInterval(interval); window.removeEventListener("focus", onFocus); };
+  }, [load]);
 
   if (!order) {
     return <div className="py-20 text-center text-sm text-muted-foreground">Loading receipt…</div>;
