@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/format";
 import { StatusPill } from "@/components/admin/ui";
 import { ShoppingBag } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/account/orders")({
+export const Route = createFileRoute("/_authenticated/account/orders/")({
   head: () => ({ meta: [{ title: "My Orders — Favour Computer Services" }] }),
   component: MyOrders,
 });
