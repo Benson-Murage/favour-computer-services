@@ -7,26 +7,26 @@ const ThemeCtx = createContext<Ctx | null>(null);
 export const THEME_STORAGE_KEY = "fcs-theme";
 
 // Inline script that runs BEFORE hydration to prevent flash of wrong theme.
-// Dark by default.
+// Light by default; user's saved choice wins.
 export const themeInitScript = `
 (function(){try{
   var k='${THEME_STORAGE_KEY}';
   var t=localStorage.getItem(k);
-  if(t!=='light'&&t!=='dark'){t='dark';}
+  if(t!=='light'&&t!=='dark'){t='light';}
   var r=document.documentElement;
   r.classList.remove('light','dark');
   r.classList.add(t);
   r.style.colorScheme=t;
-}catch(e){document.documentElement.classList.add('dark');}})();
+}catch(e){document.documentElement.classList.add('light');}})();
 `;
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY);
-      setThemeState(stored === "light" ? "light" : "dark");
+      setThemeState(stored === "dark" ? "dark" : "light");
     } catch { /* empty */ }
   }, []);
 
@@ -46,6 +46,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
 export function useTheme() {
   const c = useContext(ThemeCtx);
-  if (!c) return { theme: "dark" as Theme, setTheme: () => {}, toggle: () => {} };
+  if (!c) return { theme: "light" as Theme, setTheme: () => {}, toggle: () => {} };
   return c;
 }
