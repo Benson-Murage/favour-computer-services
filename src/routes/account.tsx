@@ -53,8 +53,8 @@ function Account() {
         <Tile to="/account/orders" Icon={Receipt} t="My Orders" s="Receipts, invoices & status" />
         <Tile to="/wishlist" Icon={Heart} t="Wishlist" s="Saved products" />
         <Tile to="/cart" Icon={ShoppingBag} t="Cart" s="Items ready to checkout" />
-        <Tile to="/account" Icon={MapPin} t="Addresses" s="Manage shipping addresses" />
-        <Tile to="/account" Icon={Settings} t="Settings" s="Email, password, preferences" />
+        <Tile to="/account/addresses" Icon={MapPin} t="Addresses" s="Manage shipping addresses" />
+        <Tile to="/account/settings" Icon={Settings} t="Settings" s="Name, phone & password" />
         {isAdmin && <Tile to="/admin" Icon={ShieldCheck} t="Admin Dashboard" s="Manage shop, services & orders" />}
       </div>
 
