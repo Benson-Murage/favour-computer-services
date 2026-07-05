@@ -18,7 +18,17 @@ export const adminRetryEmail = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await context.supabase.from("email_log").update({ status: "pending", error: null }).eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    const { data: row, error } = await context.supabase
+      .from("email_log").select("*").eq("id", data.id).single();
+    if (error || !row) throw new Error(error?.message ?? "not found");
+    await context.supabase.from("email_log")
+      .update({ status: "pending", error: null }).eq("id", data.id);
+    const { sendAndUpdateLog, wrapHtml } = await import("./email/brevo.server");
+    const body = (row.payload as { body?: string } | null)?.body ?? "";
+    const result = await sendAndUpdateLog(context.supabase, row.id, {
+      to: row.recipient,
+      subject: row.subject,
+      html: wrapHtml(row.subject, body),
+    });
+    return { ok: result.ok, error: result.error };
   });

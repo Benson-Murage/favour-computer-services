@@ -1,7 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { sendAndUpdateLog, wrapHtml } from "./email/brevo.server";
 
-export const OWNER_EMAIL = "bensonmurage254@gmail.com";
+export const OWNER_EMAIL = process.env.ADMIN_EMAIL || "bensonmurage254@gmail.com";
 
 /**
  * Records an email send attempt to the email_log table. This is the single
@@ -22,7 +23,7 @@ export async function recordEmail(
   },
 ) {
   try {
-    await supabase.from("email_log").insert({
+    const { data: inserted } = await supabase.from("email_log").insert({
       recipient: params.recipient,
       subject: params.subject,
       template: params.template,
@@ -30,7 +31,16 @@ export async function recordEmail(
       related_type: params.relatedType ?? null,
       related_id: params.relatedId ?? null,
       payload: { body: params.body ?? "", ...(params.payload ?? {}) } as never,
-    });
+    }).select("id").single();
+    if (inserted?.id) {
+      const html = wrapHtml(params.subject, params.body ?? "");
+      // fire-and-await; errors are recorded on the row and never thrown
+      await sendAndUpdateLog(supabase, inserted.id, {
+        to: params.recipient,
+        subject: params.subject,
+        html,
+      });
+    }
   } catch {
     /* non-fatal */
   }

@@ -1,0 +1,1 @@
+ALTER TABLE public.email_log ADD COLUMN IF NOT EXISTS provider_message_id text; ALTER TABLE public.email_log ADD COLUMN IF NOT EXISTS sent_at timestamptz;
