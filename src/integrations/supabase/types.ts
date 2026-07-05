@@ -823,6 +823,63 @@ export type Database = {
         }
         Relationships: []
       }
+      user_addresses: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          is_default: boolean
+          label: string | null
+          latitude: number | null
+          line1: string
+          line2: string | null
+          longitude: number | null
+          phone: string | null
+          postal_code: string | null
+          recipient_name: string | null
+          region: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          label?: string | null
+          latitude?: number | null
+          line1: string
+          line2?: string | null
+          longitude?: number | null
+          phone?: string | null
+          postal_code?: string | null
+          recipient_name?: string | null
+          region?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          label?: string | null
+          latitude?: number | null
+          line1?: string
+          line2?: string | null
+          longitude?: number | null
+          phone?: string | null
+          postal_code?: string | null
+          recipient_name?: string | null
+          region?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string

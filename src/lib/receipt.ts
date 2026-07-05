@@ -155,9 +155,28 @@ export async function generateReceiptPdf(order: ReceiptOrder, biz: BusinessInfo,
   }
 
   y += 24;
+  // Signature + stamp block
+  if (y > 680) { doc.addPage(); y = 60; }
+  const colW = (W - 100) / 2;
+  doc.setDrawColor(200);
+  doc.line(50, y + 40, 50 + colW - 20, y + 40);
+  doc.line(50 + colW + 20, y + 40, W - 50, y + 40);
+  doc.setFontSize(9);
+  doc.setTextColor(110);
+  doc.text("Authorized Signature", 50, y + 54);
+  doc.text("Company Stamp", 50 + colW + 20, y + 54);
+  y += 78;
+
+  doc.setTextColor(90);
+  doc.setFontSize(9);
+  doc.text(`Date Issued: ${new Date().toLocaleDateString("en-KE")}`, 50, y);
+  y += 18;
   doc.setTextColor(120);
   doc.setFontSize(9);
   doc.text("Thank you for choosing Favour Computer Services.", 50, y);
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text("This is a computer-generated document and does not require a physical signature.", 50, y + 12);
 
   return doc;
 }
