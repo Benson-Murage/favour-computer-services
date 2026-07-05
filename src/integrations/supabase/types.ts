@@ -269,9 +269,11 @@ export type Database = {
           error: string | null
           id: string
           payload: Json
+          provider_message_id: string | null
           recipient: string
           related_id: string | null
           related_type: string | null
+          sent_at: string | null
           status: string
           subject: string
           template: string | null
@@ -281,9 +283,11 @@ export type Database = {
           error?: string | null
           id?: string
           payload?: Json
+          provider_message_id?: string | null
           recipient: string
           related_id?: string | null
           related_type?: string | null
+          sent_at?: string | null
           status?: string
           subject: string
           template?: string | null
@@ -293,9 +297,11 @@ export type Database = {
           error?: string | null
           id?: string
           payload?: Json
+          provider_message_id?: string | null
           recipient?: string
           related_id?: string | null
           related_type?: string | null
+          sent_at?: string | null
           status?: string
           subject?: string
           template?: string | null
