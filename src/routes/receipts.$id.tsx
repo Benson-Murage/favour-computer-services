@@ -209,7 +209,21 @@ function ReceiptPreview() {
             </div>
           )}
 
-          <p className="mt-8 text-center text-xs text-muted-foreground">Thank you for choosing {biz.name}.</p>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            <div>
+              <div className="h-16 border-b border-border" />
+              <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Authorized Signature</div>
+            </div>
+            <div>
+              <div className="grid h-16 place-items-center rounded-lg border border-dashed border-border text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Company Stamp
+              </div>
+              <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Official Seal</div>
+            </div>
+          </div>
+          <div className="mt-6 text-xs text-muted-foreground">Date Issued: <span className="font-semibold text-foreground">{new Date().toLocaleDateString("en-KE")}</span></div>
+          <p className="mt-4 text-center text-xs text-muted-foreground">Thank you for choosing {biz.name}.</p>
+          <p className="mt-1 text-center text-[10px] text-muted-foreground/70">This is a computer-generated document and does not require a physical signature.</p>
         </div>
       </div>
     </div>
