@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as LiveStreamingRouteImport } from './routes/live-streaming'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -55,6 +56,11 @@ const WishlistRoute = WishlistRouteImport.update({
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveStreamingRoute = LiveStreamingRouteImport.update({
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/live-streaming': typeof LiveStreamingRoute
+  '/offline': typeof OfflineRoute
   '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -299,6 +306,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/live-streaming': typeof LiveStreamingRoute
+  '/offline': typeof OfflineRoute
   '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -338,6 +346,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/live-streaming': typeof LiveStreamingRoute
+  '/offline': typeof OfflineRoute
   '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/live-streaming'
+    | '/offline'
     | '/shop'
     | '/wishlist'
     | '/admin'
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/live-streaming'
+    | '/offline'
     | '/shop'
     | '/wishlist'
     | '/products/$slug'
@@ -454,6 +465,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/live-streaming'
+    | '/offline'
     | '/shop'
     | '/wishlist'
     | '/_authenticated/admin'
@@ -494,6 +506,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   LiveStreamingRoute: typeof LiveStreamingRoute
+  OfflineRoute: typeof OfflineRoute
   ShopRoute: typeof ShopRoute
   WishlistRoute: typeof WishlistRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -514,6 +527,13 @@ declare module '@tanstack/react-router' {
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live-streaming': {
@@ -842,6 +862,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   LiveStreamingRoute: LiveStreamingRoute,
+  OfflineRoute: OfflineRoute,
   ShopRoute: ShopRoute,
   WishlistRoute: WishlistRoute,
   ProductsSlugRoute: ProductsSlugRoute,
