@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Plus, Star, StarOff, Trash2, MapPin, Pencil } from "lucide-react";
 import { Btn, Card, Input } from "@/components/admin/ui";
 import { listMyAddresses, upsertMyAddress, deleteMyAddress, setDefaultAddress } from "@/lib/account.functions";
+import { LocationPicker, StaticMapPreview, type PickedLocation } from "@/components/location-picker";
 
 export const Route = createFileRoute("/_authenticated/account/addresses")({
   head: () => ({ meta: [{ title: "My Addresses — Favour Computer Services" }] }),
@@ -87,6 +88,37 @@ function Addresses() {
               Set as default
             </label>
           </div>
+
+          <div className="mt-6">
+            <div className="mb-2 flex items-center justify-between">
+              <div>
+                <div className="text-sm font-semibold">Pin location on map</div>
+                <p className="text-xs text-muted-foreground">Use your current location or tap the map. This helps our team find you for delivery.</p>
+              </div>
+              {(draft.latitude != null && draft.longitude != null) && (
+                <Btn variant="ghost" onClick={() => setDraft({ ...draft, latitude: null, longitude: null })}>Clear pin</Btn>
+              )}
+            </div>
+            <LocationPicker
+              value={
+                draft.latitude != null && draft.longitude != null
+                  ? { lat: draft.latitude, lng: draft.longitude, address: draft.line1 || "" }
+                  : null
+              }
+              onChange={(loc: PickedLocation | null) => {
+                if (!loc) return setDraft({ ...draft, latitude: null, longitude: null });
+                setDraft({
+                  ...draft,
+                  latitude: loc.lat,
+                  longitude: loc.lng,
+                  // Only auto-fill the street when the user hasn't typed one yet.
+                  line1: draft.line1?.trim() ? draft.line1 : loc.address,
+                });
+              }}
+              height={300}
+            />
+          </div>
+
           <div className="mt-4 flex gap-2">
             <Btn onClick={save} disabled={saving}>{saving ? "Saving…" : "Save address"}</Btn>
             <Btn variant="ghost" onClick={() => setDraft(null)}>Cancel</Btn>
@@ -111,6 +143,11 @@ function Addresses() {
                 <div className="mt-2 text-sm">{a.recipient_name || ""}{a.phone ? ` · ${a.phone}` : ""}</div>
                 <div className="text-sm text-muted-foreground">{a.line1}{a.line2 ? `, ${a.line2}` : ""}</div>
                 <div className="text-sm text-muted-foreground">{[a.city, a.region, a.postal_code].filter(Boolean).join(", ")}{a.country ? ` · ${a.country}` : ""}</div>
+                {a.latitude != null && a.longitude != null && (
+                  <div className="mt-3 max-w-md">
+                    <StaticMapPreview lat={a.latitude} lng={a.longitude} height={160} />
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 {a.is_default ? (
