@@ -18,6 +18,7 @@ import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider, themeInitScript } from "@/lib/theme";
 import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import { PWAManager } from "@/components/pwa/pwa-manager";
 
 function NotFoundComponent() {
   return (
@@ -83,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
       { name: "description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
       { property: "og:title", content: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
@@ -95,15 +96,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: logoAsset.url },
       { name: "twitter:image", content: logoAsset.url },
       { name: "theme-color", content: "#0b1220" },
+      { name: "application-name", content: "Favour Computer Services" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "FCS" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "format-detection", content: "telephone=no" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", type: "image/png", href: logoAsset.url },
-      { rel: "apple-touch-icon", href: logoAsset.url },
-      { rel: "shortcut icon", href: logoAsset.url },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icons/icon-192.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "shortcut icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -143,6 +152,7 @@ function RootComponent() {
               <SiteFooter />
             </div>
             <Toaster />
+            <PWAManager />
           </CartProvider>
         </AuthProvider>
       </ThemeProvider>
