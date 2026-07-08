@@ -6,11 +6,13 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Field, Input, Textarea } from "@/components/admin/ui";
 import { getBusinessSettings, updateBusinessSettings } from "@/lib/settings.functions";
+import { ImagePreview, uploadToBucket } from "@/components/admin/image-input";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({ component: SettingsPage });
 
 const TABS = [
   { id: "company", label: "Company" },
+  { id: "documents", label: "Documents" },
   { id: "payment", label: "Payment" },
   { id: "social", label: "Social Media" },
   { id: "email", label: "Email" },
@@ -40,7 +42,9 @@ function SettingsPage() {
       const payload: Record<string, string> = {};
       [
         "company_name","tagline","business_description","address","email","phone","whatsapp","pickup_location",
-        "till_number","paybill_number","account_number","payment_instructions",
+        "google_maps_url","website_url",
+        "till_number","paybill_number","account_number","payment_instructions","bank_name","bank_account",
+        "signature_url","stamp_url","signatory_name","signatory_title",
         "facebook_url","instagram_url","tiktok_url","twitter_url","linkedin_url","youtube_url","whatsapp_url",
         "sender_name","sender_email",
         "hero_title","hero_subtitle","hero_cta_primary_label","hero_cta_primary_url","hero_cta_secondary_label","hero_cta_secondary_url",
