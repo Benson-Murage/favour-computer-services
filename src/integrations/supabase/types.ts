@@ -129,12 +129,15 @@ export type Database = {
           about_vision: string | null
           account_number: string | null
           address: string | null
+          bank_account: string | null
+          bank_name: string | null
           business_description: string | null
           company_name: string
           contact_hours: string | null
           created_at: string
           email: string | null
           facebook_url: string | null
+          google_maps_url: string | null
           hero_cta_primary_label: string | null
           hero_cta_primary_url: string | null
           hero_cta_secondary_label: string | null
@@ -150,12 +153,17 @@ export type Database = {
           pickup_location: string | null
           sender_email: string | null
           sender_name: string | null
+          signatory_name: string | null
+          signatory_title: string | null
+          signature_url: string | null
           singleton: boolean
+          stamp_url: string | null
           tagline: string | null
           tiktok_url: string | null
           till_number: string | null
           twitter_url: string | null
           updated_at: string
+          website_url: string | null
           whatsapp: string | null
           whatsapp_url: string | null
           youtube_url: string | null
@@ -166,12 +174,15 @@ export type Database = {
           about_vision?: string | null
           account_number?: string | null
           address?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
           business_description?: string | null
           company_name?: string
           contact_hours?: string | null
           created_at?: string
           email?: string | null
           facebook_url?: string | null
+          google_maps_url?: string | null
           hero_cta_primary_label?: string | null
           hero_cta_primary_url?: string | null
           hero_cta_secondary_label?: string | null
@@ -187,12 +198,17 @@ export type Database = {
           pickup_location?: string | null
           sender_email?: string | null
           sender_name?: string | null
+          signatory_name?: string | null
+          signatory_title?: string | null
+          signature_url?: string | null
           singleton?: boolean
+          stamp_url?: string | null
           tagline?: string | null
           tiktok_url?: string | null
           till_number?: string | null
           twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
           whatsapp?: string | null
           whatsapp_url?: string | null
           youtube_url?: string | null
@@ -203,12 +219,15 @@ export type Database = {
           about_vision?: string | null
           account_number?: string | null
           address?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
           business_description?: string | null
           company_name?: string
           contact_hours?: string | null
           created_at?: string
           email?: string | null
           facebook_url?: string | null
+          google_maps_url?: string | null
           hero_cta_primary_label?: string | null
           hero_cta_primary_url?: string | null
           hero_cta_secondary_label?: string | null
@@ -224,12 +243,17 @@ export type Database = {
           pickup_location?: string | null
           sender_email?: string | null
           sender_name?: string | null
+          signatory_name?: string | null
+          signatory_title?: string | null
+          signature_url?: string | null
           singleton?: boolean
+          stamp_url?: string | null
           tagline?: string | null
           tiktok_url?: string | null
           till_number?: string | null
           twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
           whatsapp?: string | null
           whatsapp_url?: string | null
           youtube_url?: string | null
@@ -438,6 +462,8 @@ export type Database = {
           total: number
           updated_at: string
           user_id: string | null
+          verification_code: string | null
+          verification_token: string | null
         }
         Insert: {
           created_at?: string
@@ -461,6 +487,8 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          verification_code?: string | null
+          verification_token?: string | null
         }
         Update: {
           created_at?: string
@@ -484,6 +512,8 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          verification_code?: string | null
+          verification_token?: string | null
         }
         Relationships: []
       }
@@ -966,6 +996,7 @@ export type Database = {
     }
     Functions: {
       claim_first_admin: { Args: never; Returns: boolean }
+      generate_verification_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -974,6 +1005,7 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      verify_receipt: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "staff" | "customer" | "super_admin"

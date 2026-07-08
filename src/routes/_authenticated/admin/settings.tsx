@@ -6,11 +6,45 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Field, Input, Textarea } from "@/components/admin/ui";
 import { getBusinessSettings, updateBusinessSettings } from "@/lib/settings.functions";
+import { ImagePreview, uploadToBucket } from "@/components/admin/image-input";
+import { useState as useLocalState } from "react";
+import { Upload, X } from "lucide-react";
+
+function ImageUploader({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const [busy, setBusy] = useLocalState(false);
+  return (
+    <div>
+      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="mt-2 flex items-center gap-3">
+        {value ? <ImagePreview url={value} className="h-24 w-40" /> : <div className="grid h-24 w-40 place-items-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">No image</div>}
+        <div className="flex flex-col gap-2">
+          <label className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-secondary ${busy ? "pointer-events-none opacity-60" : ""}`}>
+            <Upload className="h-3.5 w-3.5" />{busy ? "Uploading…" : "Upload"}
+            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (!file) return;
+              try { setBusy(true); const url = await uploadToBucket("business-assets", file); onChange(url); toast.success(`${label} uploaded`); }
+              catch (err) { toast.error((err as Error).message); }
+              finally { setBusy(false); }
+            }} />
+          </label>
+          {value && (
+            <button type="button" onClick={() => onChange("")} className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary">
+              <X className="h-3.5 w-3.5" />Remove
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({ component: SettingsPage });
 
 const TABS = [
   { id: "company", label: "Company" },
+  { id: "documents", label: "Documents" },
   { id: "payment", label: "Payment" },
   { id: "social", label: "Social Media" },
   { id: "email", label: "Email" },
@@ -40,7 +74,9 @@ function SettingsPage() {
       const payload: Record<string, string> = {};
       [
         "company_name","tagline","business_description","address","email","phone","whatsapp","pickup_location",
-        "till_number","paybill_number","account_number","payment_instructions",
+        "google_maps_url","website_url",
+        "till_number","paybill_number","account_number","payment_instructions","bank_name","bank_account",
+        "signature_url","stamp_url","signatory_name","signatory_title",
         "facebook_url","instagram_url","tiktok_url","twitter_url","linkedin_url","youtube_url","whatsapp_url",
         "sender_name","sender_email",
         "hero_title","hero_subtitle","hero_cta_primary_label","hero_cta_primary_url","hero_cta_secondary_label","hero_cta_secondary_url",
@@ -83,6 +119,25 @@ function SettingsPage() {
               <Field label="WhatsApp Number"><Input value={f("whatsapp")} onChange={(e)=>set("whatsapp", e.target.value)} /></Field>
             </div>
             <Field label="Pickup Location"><Textarea rows={2} value={f("pickup_location")} onChange={(e)=>set("pickup_location", e.target.value)} /></Field>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Google Maps URL"><Input value={f("google_maps_url")} onChange={(e)=>set("google_maps_url", e.target.value)} placeholder="https://maps.google.com/…" /></Field>
+              <Field label="Website URL"><Input value={f("website_url")} onChange={(e)=>set("website_url", e.target.value)} placeholder="https://favourcomputers.co.ke" /></Field>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {tab==="documents" && (
+        <Card>
+          <h3 className="text-base font-bold">Receipt & Invoice Branding</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Signature and stamp images appear on all downloadable receipts, invoices, and printed documents. Recommended: transparent PNG, 400×160 for signature, 300×300 for stamp.</p>
+          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+            <ImageUploader label="Authorized Signature" value={f("signature_url")} onChange={(v)=>set("signature_url", v)} />
+            <ImageUploader label="Company Stamp" value={f("stamp_url")} onChange={(v)=>set("stamp_url", v)} />
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Field label="Signatory Name"><Input value={f("signatory_name")} onChange={(e)=>set("signatory_name", e.target.value)} placeholder="Benson Murage" /></Field>
+            <Field label="Signatory Job Title"><Input value={f("signatory_title")} onChange={(e)=>set("signatory_title", e.target.value)} placeholder="Managing Director" /></Field>
           </div>
         </Card>
       )}
@@ -98,6 +153,10 @@ function SettingsPage() {
               <Field label="Account Number"><Input value={f("account_number")} onChange={(e)=>set("account_number", e.target.value)} /></Field>
             </div>
             <Field label="Payment Instructions"><Textarea rows={5} value={f("payment_instructions")} onChange={(e)=>set("payment_instructions", e.target.value)} /></Field>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Bank Name"><Input value={f("bank_name")} onChange={(e)=>set("bank_name", e.target.value)} placeholder="e.g. Equity Bank" /></Field>
+              <Field label="Bank Account Number"><Input value={f("bank_account")} onChange={(e)=>set("bank_account", e.target.value)} /></Field>
+            </div>
           </div>
         </Card>
       )}

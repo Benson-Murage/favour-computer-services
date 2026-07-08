@@ -22,10 +22,12 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerifyIndexRouteImport } from './routes/verify.index'
 import { Route as ReceiptsIdRouteImport } from './routes/receipts.$id'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as VerifyReceiptCodeRouteImport } from './routes/verify.receipt.$code'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin/services'
@@ -112,6 +114,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyIndexRoute = VerifyIndexRouteImport.update({
+  id: '/verify/',
+  path: '/verify/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReceiptsIdRoute = ReceiptsIdRouteImport.update({
   id: '/receipts/$id',
   path: '/receipts/$id',
@@ -131,6 +138,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const VerifyReceiptCodeRoute = VerifyReceiptCodeRouteImport.update({
+  id: '/verify/receipt/$code',
+  path: '/verify/receipt/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
@@ -273,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/products/$slug': typeof ProductsSlugRoute
   '/receipts/$id': typeof ReceiptsIdRoute
+  '/verify/': typeof VerifyIndexRoute
   '/account/addresses': typeof AuthenticatedAccountAddressesRoute
   '/account/settings': typeof AuthenticatedAccountSettingsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -292,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/verify/receipt/$code': typeof VerifyReceiptCodeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
   '/account/orders/': typeof AuthenticatedAccountOrdersIndexRoute
@@ -311,6 +325,7 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/receipts/$id': typeof ReceiptsIdRoute
+  '/verify': typeof VerifyIndexRoute
   '/account/addresses': typeof AuthenticatedAccountAddressesRoute
   '/account/settings': typeof AuthenticatedAccountSettingsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -330,6 +345,7 @@ export interface FileRoutesByTo {
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/verify/receipt/$code': typeof VerifyReceiptCodeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
   '/account/orders': typeof AuthenticatedAccountOrdersIndexRoute
@@ -352,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/products/$slug': typeof ProductsSlugRoute
   '/receipts/$id': typeof ReceiptsIdRoute
+  '/verify/': typeof VerifyIndexRoute
   '/_authenticated/account/addresses': typeof AuthenticatedAccountAddressesRoute
   '/_authenticated/account/settings': typeof AuthenticatedAccountSettingsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -371,6 +388,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/verify/receipt/$code': typeof VerifyReceiptCodeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
   '/_authenticated/account/orders/': typeof AuthenticatedAccountOrdersIndexRoute
@@ -393,6 +411,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/products/$slug'
     | '/receipts/$id'
+    | '/verify/'
     | '/account/addresses'
     | '/account/settings'
     | '/admin/audit'
@@ -412,6 +431,7 @@ export interface FileRouteTypes {
     | '/admin/services'
     | '/admin/settings'
     | '/admin/users'
+    | '/verify/receipt/$code'
     | '/admin/'
     | '/account/orders/$id'
     | '/account/orders/'
@@ -431,6 +451,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/products/$slug'
     | '/receipts/$id'
+    | '/verify'
     | '/account/addresses'
     | '/account/settings'
     | '/admin/audit'
@@ -450,6 +471,7 @@ export interface FileRouteTypes {
     | '/admin/services'
     | '/admin/settings'
     | '/admin/users'
+    | '/verify/receipt/$code'
     | '/admin'
     | '/account/orders/$id'
     | '/account/orders'
@@ -471,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/products/$slug'
     | '/receipts/$id'
+    | '/verify/'
     | '/_authenticated/account/addresses'
     | '/_authenticated/account/settings'
     | '/_authenticated/admin/audit'
@@ -490,6 +513,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/services'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
+    | '/verify/receipt/$code'
     | '/_authenticated/admin/'
     | '/_authenticated/account/orders/$id'
     | '/_authenticated/account/orders/'
@@ -511,6 +535,8 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   ReceiptsIdRoute: typeof ReceiptsIdRoute
+  VerifyIndexRoute: typeof VerifyIndexRoute
+  VerifyReceiptCodeRoute: typeof VerifyReceiptCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -606,6 +632,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/': {
+      id: '/verify/'
+      path: '/verify'
+      fullPath: '/verify/'
+      preLoaderRoute: typeof VerifyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/receipts/$id': {
       id: '/receipts/$id'
       path: '/receipts/$id'
@@ -633,6 +666,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/verify/receipt/$code': {
+      id: '/verify/receipt/$code'
+      path: '/verify/receipt/$code'
+      fullPath: '/verify/receipt/$code'
+      preLoaderRoute: typeof VerifyReceiptCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
@@ -867,17 +907,9 @@ const rootRouteChildren: RootRouteChildren = {
   WishlistRoute: WishlistRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   ReceiptsIdRoute: ReceiptsIdRoute,
+  VerifyIndexRoute: VerifyIndexRoute,
+  VerifyReceiptCodeRoute: VerifyReceiptCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

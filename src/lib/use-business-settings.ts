@@ -34,6 +34,14 @@ export type BusinessSettings = {
   about_mission: string | null;
   about_vision: string | null;
   contact_hours: string | null;
+  signature_url: string | null;
+  stamp_url: string | null;
+  signatory_name: string | null;
+  signatory_title: string | null;
+  google_maps_url: string | null;
+  bank_name: string | null;
+  bank_account: string | null;
+  website_url: string | null;
 };
 
 export function useBusinessSettings() {
