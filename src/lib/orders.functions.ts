@@ -146,7 +146,23 @@ export const getMyOrder = createServerFn({ method: "GET" })
       .select("kind, subject, body, created_at")
       .eq("related_id", data.id)
       .order("created_at", { ascending: false });
-    return { order, payments: payments ?? [], notifications: notifications ?? [] };
+    const productIds = Array.from(
+      new Set(
+        (Array.isArray((order as { items?: unknown }).items)
+          ? ((order as { items: Array<{ product_id?: string }> }).items)
+          : []
+        ).map((i) => i?.product_id).filter((v): v is string => typeof v === "string")
+      )
+    );
+    let products: Array<Record<string, unknown>> = [];
+    if (productIds.length) {
+      const { data: prods } = await context.supabase
+        .from("products")
+        .select("id, name, processor, ram, storage, warranty, condition, specs")
+        .in("id", productIds);
+      products = (prods ?? []) as never;
+    }
+    return { order, payments: payments ?? [], notifications: notifications ?? [], products };
   });
 
 // ───────────────────────── Admin ─────────────────────────
