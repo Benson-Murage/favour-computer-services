@@ -87,6 +87,25 @@ function SettingsPage() {
               <Field label="WhatsApp Number"><Input value={f("whatsapp")} onChange={(e)=>set("whatsapp", e.target.value)} /></Field>
             </div>
             <Field label="Pickup Location"><Textarea rows={2} value={f("pickup_location")} onChange={(e)=>set("pickup_location", e.target.value)} /></Field>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Google Maps URL"><Input value={f("google_maps_url")} onChange={(e)=>set("google_maps_url", e.target.value)} placeholder="https://maps.google.com/…" /></Field>
+              <Field label="Website URL"><Input value={f("website_url")} onChange={(e)=>set("website_url", e.target.value)} placeholder="https://favourcomputers.co.ke" /></Field>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {tab==="documents" && (
+        <Card>
+          <h3 className="text-base font-bold">Receipt & Invoice Branding</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Signature and stamp images appear on all downloadable receipts, invoices, and printed documents. Recommended: transparent PNG, 400×160 for signature, 300×300 for stamp.</p>
+          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+            <ImageUploader label="Authorized Signature" value={f("signature_url")} onChange={(v)=>set("signature_url", v)} />
+            <ImageUploader label="Company Stamp" value={f("stamp_url")} onChange={(v)=>set("stamp_url", v)} />
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Field label="Signatory Name"><Input value={f("signatory_name")} onChange={(e)=>set("signatory_name", e.target.value)} placeholder="Benson Murage" /></Field>
+            <Field label="Signatory Job Title"><Input value={f("signatory_title")} onChange={(e)=>set("signatory_title", e.target.value)} placeholder="Managing Director" /></Field>
           </div>
         </Card>
       )}
@@ -102,6 +121,10 @@ function SettingsPage() {
               <Field label="Account Number"><Input value={f("account_number")} onChange={(e)=>set("account_number", e.target.value)} /></Field>
             </div>
             <Field label="Payment Instructions"><Textarea rows={5} value={f("payment_instructions")} onChange={(e)=>set("payment_instructions", e.target.value)} /></Field>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Bank Name"><Input value={f("bank_name")} onChange={(e)=>set("bank_name", e.target.value)} placeholder="e.g. Equity Bank" /></Field>
+              <Field label="Bank Account Number"><Input value={f("bank_account")} onChange={(e)=>set("bank_account", e.target.value)} /></Field>
+            </div>
           </div>
         </Card>
       )}
