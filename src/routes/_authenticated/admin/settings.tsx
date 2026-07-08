@@ -9,7 +9,6 @@ import { getBusinessSettings, updateBusinessSettings } from "@/lib/settings.func
 import { ImagePreview, uploadToBucket } from "@/components/admin/image-input";
 import { useState as useLocalState } from "react";
 import { Upload, X } from "lucide-react";
-import { toast } from "sonner";
 
 function ImageUploader({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   const [busy, setBusy] = useLocalState(false);
