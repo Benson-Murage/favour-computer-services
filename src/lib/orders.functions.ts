@@ -146,6 +146,16 @@ export const getMyOrder = createServerFn({ method: "GET" })
       .select("kind, subject, body, created_at")
       .eq("related_id", data.id)
       .order("created_at", { ascending: false });
+    type ProductSpec = {
+      id: string;
+      name: string;
+      processor: string | null;
+      ram: string | null;
+      storage: string | null;
+      warranty: string | null;
+      condition: string | null;
+      specs: unknown;
+    };
     const productIds = Array.from(
       new Set(
         (Array.isArray((order as { items?: unknown }).items)
@@ -154,13 +164,13 @@ export const getMyOrder = createServerFn({ method: "GET" })
         ).map((i) => i?.product_id).filter((v): v is string => typeof v === "string")
       )
     );
-    let products: Array<Record<string, unknown>> = [];
+    let products: ProductSpec[] = [];
     if (productIds.length) {
       const { data: prods } = await context.supabase
         .from("products")
         .select("id, name, processor, ram, storage, warranty, condition, specs")
         .in("id", productIds);
-      products = (prods ?? []) as never;
+      products = ((prods ?? []) as unknown) as ProductSpec[];
     }
     return { order, payments: payments ?? [], notifications: notifications ?? [], products };
   });
