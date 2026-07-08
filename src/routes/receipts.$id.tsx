@@ -240,7 +240,21 @@ function ReceiptPreview() {
             <tbody className="divide-y divide-border">
               {items.map((it, i) => (
                 <tr key={i}>
-                  <td className="py-3">{it.name}</td>
+                  <td className="py-3">
+                    <div className="font-medium">{it.name}</div>
+                    {it.product_id && specs[it.product_id] && (
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        {[specs[it.product_id].processor, specs[it.product_id].ram && `${specs[it.product_id].ram} RAM`, specs[it.product_id].storage, specs[it.product_id].condition].filter(Boolean).join(" · ")}
+                      </div>
+                    )}
+                    {it.product_id && specs[it.product_id] && (
+                      <div className="mt-0.5 text-[10px] text-muted-foreground/80">
+                        {specs[it.product_id].warranty && !/none|no\s*war/i.test(specs[it.product_id].warranty)
+                          ? `Warranty: ${specs[it.product_id].warranty}`
+                          : "No manufacturer warranty"}
+                      </div>
+                    )}
+                  </td>
                   <td className="py-3 text-right">{it.qty}</td>
                   <td className="py-3 text-right font-mono">{formatPrice(it.price)}</td>
                   <td className="py-3 text-right font-mono font-semibold">{formatPrice(it.price * it.qty)}</td>
