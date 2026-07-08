@@ -47,7 +47,7 @@ function VerifyPage() {
     setLoading(true);
     verify({ data: { code } })
       .then((r) => {
-        if (!cancelled) setResult(r.result as Verification);
+        if (!cancelled) setResult(JSON.parse(r.json) as Verification);
       })
       .catch(() => {
         if (!cancelled) setResult({ valid: false });
