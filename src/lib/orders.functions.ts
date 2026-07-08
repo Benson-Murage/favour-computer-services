@@ -154,7 +154,7 @@ export const getMyOrder = createServerFn({ method: "GET" })
       storage: string | null;
       warranty: string | null;
       condition: string | null;
-      specs: unknown;
+      specs: string | null;
     };
     const productIds = Array.from(
       new Set(
@@ -170,7 +170,16 @@ export const getMyOrder = createServerFn({ method: "GET" })
         .from("products")
         .select("id, name, processor, ram, storage, warranty, condition, specs")
         .in("id", productIds);
-      products = ((prods ?? []) as unknown) as ProductSpec[];
+      products = ((prods ?? []) as Array<Record<string, unknown>>).map((p) => ({
+        id: String(p.id ?? ""),
+        name: String(p.name ?? ""),
+        processor: (p.processor as string | null) ?? null,
+        ram: (p.ram as string | null) ?? null,
+        storage: (p.storage as string | null) ?? null,
+        warranty: (p.warranty as string | null) ?? null,
+        condition: (p.condition as string | null) ?? null,
+        specs: p.specs == null ? null : JSON.stringify(p.specs),
+      }));
     }
     return { order, payments: payments ?? [], notifications: notifications ?? [], products };
   });
