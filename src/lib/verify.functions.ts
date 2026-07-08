@@ -18,7 +18,7 @@ export const verifyReceipt = createServerFn({ method: "GET" })
       { _code: data.code.toUpperCase() } as never,
     );
     if (error) throw new Error(error.message);
-    return { result: (result ?? { valid: false }) as Record<string, unknown> };
+    return { json: JSON.stringify(result ?? { valid: false }) };
   });
 
 export const lookupProductSpecs = createServerFn({ method: "GET" })
