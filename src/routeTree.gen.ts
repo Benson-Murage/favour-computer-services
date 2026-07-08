@@ -26,6 +26,7 @@ import { Route as ReceiptsIdRouteImport } from './routes/receipts.$id'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as VerifyReceiptCodeRouteImport } from './routes/verify.receipt.$code'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin/services'
@@ -131,6 +132,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const VerifyReceiptCodeRoute = VerifyReceiptCodeRouteImport.update({
+  id: '/verify/receipt/$code',
+  path: '/verify/receipt/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/verify/receipt/$code': typeof VerifyReceiptCodeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
   '/account/orders/': typeof AuthenticatedAccountOrdersIndexRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/verify/receipt/$code': typeof VerifyReceiptCodeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
   '/account/orders': typeof AuthenticatedAccountOrdersIndexRoute
@@ -371,6 +379,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/verify/receipt/$code': typeof VerifyReceiptCodeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
   '/_authenticated/account/orders/': typeof AuthenticatedAccountOrdersIndexRoute
@@ -412,6 +421,7 @@ export interface FileRouteTypes {
     | '/admin/services'
     | '/admin/settings'
     | '/admin/users'
+    | '/verify/receipt/$code'
     | '/admin/'
     | '/account/orders/$id'
     | '/account/orders/'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/admin/services'
     | '/admin/settings'
     | '/admin/users'
+    | '/verify/receipt/$code'
     | '/admin'
     | '/account/orders/$id'
     | '/account/orders'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/services'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
+    | '/verify/receipt/$code'
     | '/_authenticated/admin/'
     | '/_authenticated/account/orders/$id'
     | '/_authenticated/account/orders/'
@@ -511,6 +523,7 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   ReceiptsIdRoute: typeof ReceiptsIdRoute
+  VerifyReceiptCodeRoute: typeof VerifyReceiptCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -633,6 +646,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/verify/receipt/$code': {
+      id: '/verify/receipt/$code'
+      path: '/verify/receipt/$code'
+      fullPath: '/verify/receipt/$code'
+      preLoaderRoute: typeof VerifyReceiptCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
@@ -867,6 +887,7 @@ const rootRouteChildren: RootRouteChildren = {
   WishlistRoute: WishlistRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   ReceiptsIdRoute: ReceiptsIdRoute,
+  VerifyReceiptCodeRoute: VerifyReceiptCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
