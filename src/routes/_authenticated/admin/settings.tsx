@@ -7,6 +7,39 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { Btn, Card, Field, Input, Textarea } from "@/components/admin/ui";
 import { getBusinessSettings, updateBusinessSettings } from "@/lib/settings.functions";
 import { ImagePreview, uploadToBucket } from "@/components/admin/image-input";
+import { useState as useLocalState } from "react";
+import { Upload, X } from "lucide-react";
+import { toast } from "sonner";
+
+function ImageUploader({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const [busy, setBusy] = useLocalState(false);
+  return (
+    <div>
+      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="mt-2 flex items-center gap-3">
+        {value ? <ImagePreview url={value} className="h-24 w-40" /> : <div className="grid h-24 w-40 place-items-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">No image</div>}
+        <div className="flex flex-col gap-2">
+          <label className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-secondary ${busy ? "pointer-events-none opacity-60" : ""}`}>
+            <Upload className="h-3.5 w-3.5" />{busy ? "Uploading…" : "Upload"}
+            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (!file) return;
+              try { setBusy(true); const url = await uploadToBucket("business-assets", file); onChange(url); toast.success(`${label} uploaded`); }
+              catch (err) { toast.error((err as Error).message); }
+              finally { setBusy(false); }
+            }} />
+          </label>
+          {value && (
+            <button type="button" onClick={() => onChange("")} className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary">
+              <X className="h-3.5 w-3.5" />Remove
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({ component: SettingsPage });
 
