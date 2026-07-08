@@ -47,6 +47,14 @@ type SettingsUpdate = Partial<{
   about_mission: string;
   about_vision: string;
   contact_hours: string;
+  signature_url: string;
+  stamp_url: string;
+  signatory_name: string;
+  signatory_title: string;
+  google_maps_url: string;
+  bank_name: string;
+  bank_account: string;
+  website_url: string;
 }>;
 
 export const updateBusinessSettings = createServerFn({ method: "POST" })
