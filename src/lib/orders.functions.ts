@@ -146,42 +146,7 @@ export const getMyOrder = createServerFn({ method: "GET" })
       .select("kind, subject, body, created_at")
       .eq("related_id", data.id)
       .order("created_at", { ascending: false });
-    type ProductSpec = {
-      id: string;
-      name: string;
-      processor: string | null;
-      ram: string | null;
-      storage: string | null;
-      warranty: string | null;
-      condition: string | null;
-      specs: string | null;
-    };
-    const productIds = Array.from(
-      new Set(
-        (Array.isArray((order as { items?: unknown }).items)
-          ? ((order as { items: Array<{ product_id?: string }> }).items)
-          : []
-        ).map((i) => i?.product_id).filter((v): v is string => typeof v === "string")
-      )
-    );
-    let products: ProductSpec[] = [];
-    if (productIds.length) {
-      const { data: prods } = await context.supabase
-        .from("products")
-        .select("id, name, processor, ram, storage, warranty, condition, specs")
-        .in("id", productIds);
-      products = ((prods ?? []) as Array<Record<string, unknown>>).map((p) => ({
-        id: String(p.id ?? ""),
-        name: String(p.name ?? ""),
-        processor: (p.processor as string | null) ?? null,
-        ram: (p.ram as string | null) ?? null,
-        storage: (p.storage as string | null) ?? null,
-        warranty: (p.warranty as string | null) ?? null,
-        condition: (p.condition as string | null) ?? null,
-        specs: p.specs == null ? null : JSON.stringify(p.specs),
-      }));
-    }
-    return { order, payments: payments ?? [], notifications: notifications ?? [], products };
+    return { order, payments: payments ?? [], notifications: notifications ?? [] };
   });
 
 // ───────────────────────── Admin ─────────────────────────
