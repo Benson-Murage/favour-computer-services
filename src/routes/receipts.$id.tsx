@@ -294,17 +294,40 @@ function ReceiptPreview() {
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
             <div>
-              <div className="h-16 border-b border-border" />
+              <div className="flex h-16 items-end border-b border-border">
+                {biz.signature_url && <img src={biz.signature_url} alt="Signature" className="max-h-14 object-contain" />}
+              </div>
               <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Authorized Signature</div>
+              {biz.signatory_name && <div className="text-sm font-semibold">{biz.signatory_name}</div>}
+              {biz.signatory_title && <div className="text-xs text-muted-foreground">{biz.signatory_title}</div>}
             </div>
             <div>
-              <div className="grid h-16 place-items-center rounded-lg border border-dashed border-border text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Company Stamp
+              <div className="grid h-16 place-items-center rounded-lg border border-dashed border-border">
+                {biz.stamp_url
+                  ? <img src={biz.stamp_url} alt="Stamp" className="max-h-14 object-contain" />
+                  : <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Company Stamp</span>}
               </div>
               <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Official Seal</div>
             </div>
           </div>
           <div className="mt-6 text-xs text-muted-foreground">Date Issued: <span className="font-semibold text-foreground">{new Date().toLocaleDateString("en-KE")}</span></div>
+
+          {verificationCode && (
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-secondary/40 p-5">
+              <div className="min-w-0">
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Verify this receipt</div>
+                <div className="mt-1 font-mono text-lg font-bold">{verificationCode}</div>
+                <div className="mt-1 break-all text-xs text-muted-foreground">{verifyUrl}</div>
+                <div className="mt-3 flex flex-wrap gap-2 print:hidden">
+                  <button onClick={copyLink} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-secondary"><Copy className="h-3.5 w-3.5" />Copy Link</button>
+                  <a href={verifyUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-secondary"><ExternalLink className="h-3.5 w-3.5" />Open</a>
+                  {qrDataUrl && <button onClick={downloadQr} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-secondary"><Download className="h-3.5 w-3.5" />QR</button>}
+                </div>
+              </div>
+              {qrDataUrl && <img src={qrDataUrl} alt="Verification QR" className="h-32 w-32 rounded-lg border border-border bg-white p-2" />}
+            </div>
+          )}
+
           <p className="mt-4 text-center text-xs text-muted-foreground">Thank you for choosing {biz.name}.</p>
           <p className="mt-1 text-center text-[10px] text-muted-foreground/70">This is a computer-generated document and does not require a physical signature.</p>
         </div>
