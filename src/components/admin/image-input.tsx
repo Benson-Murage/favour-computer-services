@@ -17,7 +17,9 @@ export async function uploadToBucket(bucket: string, file: File): Promise<string
   });
   if (error) throw new Error(error.message);
   // Try signed URL first (works whether bucket is public or private).
-  const { data: signed, error: sErr } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
+  const { data: signed, error: sErr } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(path, SIGNED_URL_TTL);
   if (!sErr && signed?.signedUrl) return signed.signedUrl;
   const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path);
   return pub.publicUrl;
@@ -25,15 +27,29 @@ export async function uploadToBucket(bucket: string, file: File): Promise<string
 
 type Status = "idle" | "loading" | "ok" | "error";
 
-export function ImagePreview({ url, className = "h-20 w-20" }: { url: string; className?: string }) {
+export function ImagePreview({
+  url,
+  className = "h-20 w-20",
+}: {
+  url: string;
+  className?: string;
+}) {
   const [status, setStatus] = useState<Status>(url ? "loading" : "idle");
-  useEffect(() => { setStatus(url ? "loading" : "idle"); }, [url]);
+  useEffect(() => {
+    setStatus(url ? "loading" : "idle");
+  }, [url]);
   if (!url) return null;
   return (
-    <div className={`relative grid place-items-center overflow-hidden rounded-lg border border-border bg-secondary ${className}`}>
+    <div
+      className={`relative grid place-items-center overflow-hidden rounded-lg border border-border bg-secondary ${className}`}
+    >
       {status !== "ok" && (
         <div className="absolute inset-0 grid place-items-center text-muted-foreground">
-          {status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageOff className="h-4 w-4" />}
+          {status === "loading" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ImageOff className="h-4 w-4" />
+          )}
         </div>
       )}
       <img
@@ -69,8 +85,11 @@ export function ImageUrlField({
       const url = await uploadToBucket(bucket, file);
       onChange(url);
       toast.success("Image uploaded");
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setUploading(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
   };
   return (
     <div>
@@ -86,19 +105,28 @@ export function ImageUrlField({
           />
           <div className="flex items-center gap-2">
             <label className="inline-flex h-9 cursor-pointer items-center gap-1 rounded-full bg-secondary px-3 text-xs font-semibold hover:bg-secondary/80">
-              {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+              {uploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Upload className="h-3.5 w-3.5" />
+              )}
               {uploading ? "Uploading…" : "Upload from computer"}
               <input
                 type="file"
                 accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/avif"
                 className="hidden"
                 disabled={uploading}
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.currentTarget.value = ""; }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) upload(f);
+                  e.currentTarget.value = "";
+                }}
               />
             </label>
             {value && (
               <Btn variant="ghost" onClick={() => onChange("")}>
-                <X className="mr-1 h-3.5 w-3.5" />Clear
+                <X className="mr-1 h-3.5 w-3.5" />
+                Clear
               </Btn>
             )}
           </div>

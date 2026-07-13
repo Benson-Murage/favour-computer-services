@@ -10,7 +10,11 @@ export const getBusinessSettings = createServerFn({ method: "GET" }).handler(asy
     process.env.SUPABASE_PUBLISHABLE_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false } },
   );
-  const { data, error } = await supabase.from("business_settings").select("*").limit(1).maybeSingle();
+  const { data, error } = await supabase
+    .from("business_settings")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
 });

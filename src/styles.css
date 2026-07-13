@@ -75,7 +75,7 @@
   --secondary: oklch(0.96 0.008 250);
   --secondary-foreground: oklch(0.22 0.03 250);
   --muted: oklch(0.96 0.008 250);
-  --muted-foreground: oklch(0.50 0.02 250);
+  --muted-foreground: oklch(0.5 0.02 250);
   --accent: oklch(0.72 0.16 215);
   --accent-foreground: oklch(0.15 0.03 250);
   --destructive: oklch(0.58 0.22 27);
@@ -85,10 +85,15 @@
   --border: oklch(0.92 0.008 250);
   --input: oklch(0.92 0.008 250);
   --ring: oklch(0.72 0.16 215);
-  --gradient-hero: linear-gradient(135deg, oklch(0.20 0.04 255) 0%, oklch(0.30 0.10 240) 60%, oklch(0.55 0.18 215) 100%);
-  --gradient-accent: linear-gradient(135deg, oklch(0.72 0.16 215), oklch(0.65 0.20 260));
-  --shadow-card: 0 1px 2px oklch(0.20 0.04 250 / 0.06), 0 8px 24px -8px oklch(0.20 0.04 250 / 0.10);
-  --shadow-elevated: 0 20px 50px -20px oklch(0.20 0.04 250 / 0.25);
+  --gradient-hero: linear-gradient(
+    135deg,
+    oklch(0.2 0.04 255) 0%,
+    oklch(0.3 0.1 240) 60%,
+    oklch(0.55 0.18 215) 100%
+  );
+  --gradient-accent: linear-gradient(135deg, oklch(0.72 0.16 215), oklch(0.65 0.2 260));
+  --shadow-card: 0 1px 2px oklch(0.2 0.04 250 / 0.06), 0 8px 24px -8px oklch(0.2 0.04 250 / 0.1);
+  --shadow-elevated: 0 20px 50px -20px oklch(0.2 0.04 250 / 0.25);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -162,13 +167,26 @@
   }
 
   /* Consistent placeholder + disabled contrast in both themes */
-  ::placeholder { color: var(--color-muted-foreground); opacity: 0.75; }
-  input:disabled, textarea:disabled, select:disabled, button:disabled {
+  ::placeholder {
+    color: var(--color-muted-foreground);
+    opacity: 0.75;
+  }
+  input:disabled,
+  textarea:disabled,
+  select:disabled,
+  button:disabled {
     opacity: 0.6;
   }
 }
 
 @media print {
-  header, footer, .print\:hidden { display: none !important; }
-  body { background: white !important; color: black !important; }
+  header,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }

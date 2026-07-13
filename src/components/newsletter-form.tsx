@@ -3,7 +3,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { subscribeNewsletter } from "@/lib/newsletter.functions";
 
-export function NewsletterForm({ source = "footer", dark = true }: { source?: string; dark?: boolean }) {
+export function NewsletterForm({
+  source = "footer",
+  dark = true,
+}: {
+  source?: string;
+  dark?: boolean;
+}) {
   const subscribe = useServerFn(subscribeNewsletter);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);

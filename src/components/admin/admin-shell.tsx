@@ -1,5 +1,23 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Tags, Building2, Boxes, MessageSquare, CalendarCheck2, Store, Megaphone, Settings, ScrollText, ShoppingCart, Wallet, Mail, Newspaper, Users, Receipt } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Tags,
+  Building2,
+  Boxes,
+  MessageSquare,
+  CalendarCheck2,
+  Store,
+  Megaphone,
+  Settings,
+  ScrollText,
+  ShoppingCart,
+  Wallet,
+  Mail,
+  Newspaper,
+  Users,
+  Receipt,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/fcs-logo.png.asset.json";
@@ -35,7 +53,9 @@ export function AdminShell({ title, children }: { title: string; children: React
         <div className="flex items-center gap-2.5 px-3 pb-3 pt-1">
           <img src={logoAsset.url} alt="FCS" className="h-9 w-9 object-contain" />
           <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Admin</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              Admin
+            </div>
             <div className="text-sm font-bold leading-tight">Favour Computer</div>
           </div>
         </div>
@@ -48,7 +68,9 @@ export function AdminShell({ title, children }: { title: string; children: React
                 to={n.to}
                 className={cn(
                   "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition",
-                  active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  active
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
                 <n.Icon className="h-4 w-4" />

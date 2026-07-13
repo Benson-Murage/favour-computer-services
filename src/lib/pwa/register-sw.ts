@@ -1,6 +1,5 @@
-// Guarded service worker registration. Only registers in production, on
-// real user origins — never in Lovable preview, dev, or inside an iframe.
-// Provides an event-based update notifier and a kill-switch via ?sw=off.
+// Guarded service worker registration. Only registers in production and on
+// real user origins — never in dev, inside an iframe, or when disabled with ?sw=off.
 
 const SW_URL = "/sw.js";
 
@@ -16,9 +15,6 @@ function isBlockedContext(): boolean {
   }
   const host = window.location.hostname;
   if (host.startsWith("id-preview--") || host.startsWith("preview--")) return true;
-  if (host === "lovableproject.com" || host.endsWith(".lovableproject.com")) return true;
-  if (host === "lovableproject-dev.com" || host.endsWith(".lovableproject-dev.com")) return true;
-  if (host === "beta.lovable.dev" || host.endsWith(".beta.lovable.dev")) return true;
   if (window.location.search.includes("sw=off")) return true;
   return false;
 }

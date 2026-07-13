@@ -50,10 +50,18 @@ export function SiteHeader() {
             F&amp;F Building, Shop U13 · Next to Odeon Cinema, Nairobi
           </span>
           <span className="flex items-center gap-3">
-            <a href="tel:+254726548592" className="inline-flex items-center gap-1.5 hover:text-[color:var(--accent)]">
+            <a
+              href="tel:+254726548592"
+              className="inline-flex items-center gap-1.5 hover:text-[color:var(--accent)]"
+            >
               <Phone className="h-3.5 w-3.5" /> 0726 548 592
             </a>
-            <a href="https://wa.me/254726548592" target="_blank" rel="noreferrer" className="hidden sm:inline hover:text-[color:var(--accent)]">
+            <a
+              href="https://wa.me/254726548592"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:inline hover:text-[color:var(--accent)]"
+            >
               WhatsApp
             </a>
           </span>
@@ -149,10 +157,16 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="my-2 h-px bg-border" />
-            <Link to="/wishlist" className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+            <Link
+              to="/wishlist"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+            >
               Wishlist
             </Link>
-            <Link to="/account" className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+            <Link
+              to="/account"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+            >
               Account
             </Link>
           </div>

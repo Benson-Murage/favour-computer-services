@@ -2,9 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertAdmin, logAudit } from "./admin/audit.server";
 import type { Database } from "@/integrations/supabase/types";
-import { notifyBoth } from "./notify.server";
 
 const QuoteInput = z.object({
   source: z.enum(["cctv", "livestream", "product", "contact", "general"]).default("general"),
@@ -20,11 +18,9 @@ const QuoteInput = z.object({
 export type QuoteInputType = z.infer<typeof QuoteInput>;
 
 function adminClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 
 export const submitQuote = createServerFn({ method: "POST" })
@@ -57,18 +53,23 @@ export const submitQuote = createServerFn({ method: "POST" })
         entity_id: row.id,
         details: data as never,
       });
-    } catch { /* non-fatal */ }
-    await notifyBoth(supabase, {
-      customerEmail: data.email,
-      customerUserId: null,
-      kind: `quote-${data.source}`,
-      adminSubject: `New ${data.source} quote request from ${data.name}`,
-      adminBody: `Name: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nPackage: ${data.package || "—"}\nLocation: ${data.location || "—"}\nService: ${data.service_type || "—"}\n\nMessage:\n${data.message || "—"}`,
-      customerSubject: `We received your request — Favour Computer Services`,
-      customerBody: `Hi ${data.name},\n\nThanks for reaching out. Our team has received your ${data.source} inquiry and will get back to you shortly with a tailored quote.\n\nFavour Computer Services\n0726 548 592`,
-      relatedType: "quote",
-      relatedId: row.id,
-    });
+    } catch {
+      /* non-fatal */
+    }
+    {
+      const { notifyBoth } = await import("./notify.server");
+      await notifyBoth(supabase, {
+        customerEmail: data.email,
+        customerUserId: null,
+        kind: `quote-${data.source}`,
+        adminSubject: `New ${data.source} quote request from ${data.name}`,
+        adminBody: `Name: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nPackage: ${data.package || "—"}\nLocation: ${data.location || "—"}\nService: ${data.service_type || "—"}\n\nMessage:\n${data.message || "—"}`,
+        customerSubject: `We received your request — Favour Computer Services`,
+        customerBody: `Hi ${data.name},\n\nThanks for reaching out. Our team has received your ${data.source} inquiry and will get back to you shortly with a tailored quote.\n\nFavour Computer Services\n0726 548 592`,
+        relatedType: "quote",
+        relatedId: row.id,
+      });
+    }
     return { id: row.id };
   });
 
@@ -102,6 +103,7 @@ export const submitBooking = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    const { notifyBoth } = await import("./notify.server");
     await notifyBoth(supabase, {
       customerEmail: data.email,
       customerUserId: null,
@@ -121,6 +123,7 @@ export const submitBooking = createServerFn({ method: "POST" })
 export const listQuotes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { assertAdmin } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("quotes")
@@ -134,6 +137,7 @@ export const listQuotes = createServerFn({ method: "GET" })
 export const listBookings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { assertAdmin } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("bookings")
@@ -154,6 +158,7 @@ export const updateQuote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: z.infer<typeof UpdateQuote>) => UpdateQuote.parse(data))
   .handler(async ({ data, context }) => {
+    const { assertAdmin, logAudit } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
     const { id, ...patch } = data;
     const { error } = await context.supabase.from("quotes").update(patch).eq("id", id);
@@ -171,7 +176,7 @@ export const updateQuote = createServerFn({ method: "POST" })
 
 const UpdateBooking = z.object({
   id: z.string().uuid(),
-  status: z.enum(["new","contacted","quoted","confirmed","completed","cancelled"]).optional(),
+  status: z.enum(["new", "contacted", "quoted", "confirmed", "completed", "cancelled"]).optional(),
   internal_notes: z.string().max(5000).optional(),
 });
 
@@ -179,6 +184,7 @@ export const updateBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: z.infer<typeof UpdateBooking>) => UpdateBooking.parse(data))
   .handler(async ({ data, context }) => {
+    const { assertAdmin, logAudit } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
     const { id, ...patch } = data;
     const { error } = await context.supabase.from("bookings").update(patch).eq("id", id);

@@ -51,12 +51,18 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             {p.brand.name}
           </p>
         )}
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">{p.name}</h3>
+        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+          {p.name}
+        </h3>
         <div className="mt-auto flex items-end justify-between pt-2">
           <div>
-            <div className="text-lg font-bold tracking-tight text-foreground">{formatPrice(price)}</div>
+            <div className="text-lg font-bold tracking-tight text-foreground">
+              {formatPrice(price)}
+            </div>
             {compare && compare > price && (
-              <div className="text-xs text-muted-foreground line-through">{formatPrice(compare)}</div>
+              <div className="text-xs text-muted-foreground line-through">
+                {formatPrice(compare)}
+              </div>
             )}
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">

@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CartProvider } from "@/lib/cart";
@@ -45,9 +44,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -86,13 +82,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
-      { name: "description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
-      { property: "og:title", content: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
-      { property: "og:description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
+      {
+        name: "description",
+        content:
+          "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema.",
+      },
+      {
+        property: "og:title",
+        content: "Favour Computer Services — Computer Shop & CCTV in Nairobi",
+      },
+      {
+        property: "og:description",
+        content:
+          "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Favour Computer Services — Computer Shop & CCTV in Nairobi" },
-      { name: "twitter:description", content: "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema." },
+      {
+        name: "twitter:title",
+        content: "Favour Computer Services — Computer Shop & CCTV in Nairobi",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema.",
+      },
       { property: "og:image", content: logoAsset.url },
       { name: "twitter:image", content: logoAsset.url },
       { name: "theme-color", content: "#0b1220" },

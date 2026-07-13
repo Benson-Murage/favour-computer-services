@@ -31,7 +31,12 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
   }
 }
 
-export function LocationPicker({ value, onChange, defaultCenter = DEFAULT_CENTER, height = 320 }: Props) {
+export function LocationPicker({
+  value,
+  onChange,
+  defaultCenter = DEFAULT_CENTER,
+  height = 320,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const markerRef = useRef<import("leaflet").Marker | null>(null);
@@ -53,7 +58,10 @@ export function LocationPicker({ value, onChange, defaultCenter = DEFAULT_CENTER
       L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl: iconRetina, shadowUrl: shadow });
 
       const start = value ? [value.lat, value.lng] : [defaultCenter.lat, defaultCenter.lng];
-      const map = L.map(ref.current, { zoomControl: true }).setView(start as [number, number], value ? 16 : 12);
+      const map = L.map(ref.current, { zoomControl: true }).setView(
+        start as [number, number],
+        value ? 16 : 12,
+      );
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap",
         maxZoom: 19,
@@ -147,7 +155,11 @@ export function LocationPicker({ value, onChange, defaultCenter = DEFAULT_CENTER
           disabled={loadingLoc}
           className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-semibold transition hover:bg-secondary disabled:opacity-50"
         >
-          {loadingLoc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Crosshair className="h-3.5 w-3.5" />}
+          {loadingLoc ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Crosshair className="h-3.5 w-3.5" />
+          )}
           Use current location
         </button>
         <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-secondary px-3 text-[11px] font-medium text-muted-foreground">
@@ -179,7 +191,17 @@ export function LocationPicker({ value, onChange, defaultCenter = DEFAULT_CENTER
   );
 }
 
-export function StaticMapPreview({ lat, lng, height = 220, address }: { lat: number; lng: number; height?: number; address?: string }) {
+export function StaticMapPreview({
+  lat,
+  lng,
+  height = 220,
+  address,
+}: {
+  lat: number;
+  lng: number;
+  height?: number;
+  address?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let disposed = false;
@@ -193,16 +215,29 @@ export function StaticMapPreview({ lat, lng, height = 220, address }: { lat: num
       // @ts-expect-error internal
       delete L.Icon.Default.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl: iconRetina, shadowUrl: shadow });
-      map = L.map(ref.current, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false }).setView([lat, lng], 15);
+      map = L.map(ref.current, {
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+      }).setView([lat, lng], 15);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
       L.marker([lat, lng]).addTo(map);
       setTimeout(() => map?.invalidateSize(), 100);
     })();
-    return () => { disposed = true; map?.remove(); };
+    return () => {
+      disposed = true;
+      map?.remove();
+    };
   }, [lat, lng]);
   return (
     <div className="space-y-2">
-      <div ref={ref} style={{ height }} className="w-full overflow-hidden rounded-2xl border border-border" />
+      <div
+        ref={ref}
+        style={{ height }}
+        className="w-full overflow-hidden rounded-2xl border border-border"
+      />
       {address && <div className="text-xs text-muted-foreground">{address}</div>}
       <a
         href={`https://www.google.com/maps?q=${lat},${lng}`}

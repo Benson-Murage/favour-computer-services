@@ -45,14 +45,25 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
     }
     setSubmitting(true);
     try {
-      const source = /cctv/i.test(parsed.data.service) ? "cctv"
-        : /stream/i.test(parsed.data.service) ? "livestream"
-        : /product/i.test(parsed.data.service) ? "product" : "contact";
-      await submit({ data: {
-        source, name: parsed.data.name, email: parsed.data.email, phone: parsed.data.phone,
-        service_type: parsed.data.service, message: parsed.data.message,
-        package: "", location: "",
-      } });
+      const source = /cctv/i.test(parsed.data.service)
+        ? "cctv"
+        : /stream/i.test(parsed.data.service)
+          ? "livestream"
+          : /product/i.test(parsed.data.service)
+            ? "product"
+            : "contact";
+      await submit({
+        data: {
+          source,
+          name: parsed.data.name,
+          email: parsed.data.email,
+          phone: parsed.data.phone,
+          service_type: parsed.data.service,
+          message: parsed.data.message,
+          package: "",
+          location: "",
+        },
+      });
       setSent(true);
       toast.success("Message received — we'll respond within 1 business day.");
       (e.target as HTMLFormElement).reset();
@@ -67,10 +78,16 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
   if (sent) {
     return (
       <div className="mt-6 rounded-2xl border border-border bg-emerald-500/10 p-6 text-center">
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-500/20 text-emerald-700 text-2xl">✓</div>
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-500/20 text-emerald-700 text-2xl">
+          ✓
+        </div>
         <h3 className="mt-3 text-lg font-bold">Message received</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Our team will reach out within 1 business day.</p>
-        <button onClick={()=>setSent(false)} className="mt-4 text-xs font-semibold underline">Send another message</button>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Our team will reach out within 1 business day.
+        </p>
+        <button onClick={() => setSent(false)} className="mt-4 text-xs font-semibold underline">
+          Send another message
+        </button>
       </div>
     );
   }
@@ -84,7 +101,9 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Phone number" name="phone" type="tel" placeholder="07XX XXX XXX" />
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service required</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Service required
+          </span>
           <select
             name="service"
             value={service}
@@ -93,12 +112,18 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
             className="mt-1 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
           >
             <option value="">Select a service…</option>
-            {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
+            {SERVICES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </label>
       </div>
       <label className="block">
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Message</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Message
+        </span>
         <textarea
           name="message"
           rows={5}
@@ -115,7 +140,12 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
         >
           {submitting ? "Sending…" : "Send message"}
         </button>
-        <a href="https://wa.me/254726548592" target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center rounded-full bg-[color:var(--accent)] px-5 text-sm font-semibold text-accent-foreground">
+        <a
+          href="https://wa.me/254726548592"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex h-11 items-center justify-center rounded-full bg-[color:var(--accent)] px-5 text-sm font-semibold text-accent-foreground"
+        >
           Or WhatsApp us
         </a>
         <span className="text-xs text-muted-foreground">We respond within 1 business day.</span>
@@ -124,10 +154,22 @@ export function QuoteForm({ defaultService }: { defaultService?: string }) {
   );
 }
 
-function Field({ label, name, type = "text", placeholder }: { label: string; name: string; type?: string; placeholder?: string }) {
+function Field({
+  label,
+  name,
+  type = "text",
+  placeholder,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  placeholder?: string;
+}) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
       <input
         name={name}
         type={type}

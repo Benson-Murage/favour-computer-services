@@ -31,7 +31,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) setItems(JSON.parse(raw));
-    } catch {}
+    } catch {
+      // Ignore corrupt or unavailable local cart storage and start fresh.
+    }
     setHydrated(true);
   }, []);
 
@@ -39,23 +41,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (hydrated) localStorage.setItem(KEY, JSON.stringify(items));
   }, [items, hydrated]);
 
-  const value = useMemo<CartCtx>(() => ({
-    items,
-    add: (item, qty = 1) =>
-      setItems((prev) => {
-        const ex = prev.find((p) => p.id === item.id);
-        if (ex) return prev.map((p) => (p.id === item.id ? { ...p, qty: p.qty + qty } : p));
-        return [...prev, { ...item, qty }];
-      }),
-    remove: (id) => setItems((prev) => prev.filter((p) => p.id !== id)),
-    setQty: (id, qty) =>
-      setItems((prev) =>
-        qty <= 0 ? prev.filter((p) => p.id !== id) : prev.map((p) => (p.id === id ? { ...p, qty } : p)),
-      ),
-    clear: () => setItems([]),
-    count: items.reduce((a, b) => a + b.qty, 0),
-    subtotal: items.reduce((a, b) => a + b.qty * Number(b.price), 0),
-  }), [items]);
+  const value = useMemo<CartCtx>(
+    () => ({
+      items,
+      add: (item, qty = 1) =>
+        setItems((prev) => {
+          const ex = prev.find((p) => p.id === item.id);
+          if (ex) return prev.map((p) => (p.id === item.id ? { ...p, qty: p.qty + qty } : p));
+          return [...prev, { ...item, qty }];
+        }),
+      remove: (id) => setItems((prev) => prev.filter((p) => p.id !== id)),
+      setQty: (id, qty) =>
+        setItems((prev) =>
+          qty <= 0
+            ? prev.filter((p) => p.id !== id)
+            : prev.map((p) => (p.id === id ? { ...p, qty } : p)),
+        ),
+      clear: () => setItems([]),
+      count: items.reduce((a, b) => a + b.qty, 0),
+      subtotal: items.reduce((a, b) => a + b.qty * Number(b.price), 0),
+    }),
+    [items],
+  );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

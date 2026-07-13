@@ -1,7 +1,13 @@
 import { cn } from "@/lib/utils";
 import { conditionLabel } from "@/lib/format";
 
-export function ConditionBadge({ condition, className }: { condition: string; className?: string }) {
+export function ConditionBadge({
+  condition,
+  className,
+}: {
+  condition: string;
+  className?: string;
+}) {
   const isNew = condition === "new";
   return (
     <span

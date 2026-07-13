@@ -1,7 +1,17 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
-import { Heart, ShieldCheck, Truck, Wrench, Star, Minus, Plus, ShoppingBag, Check } from "lucide-react";
+import {
+  Heart,
+  ShieldCheck,
+  Truck,
+  Wrench,
+  Star,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ConditionBadge } from "@/components/condition-badge";
@@ -23,7 +33,9 @@ const productOpts = (slug: string) =>
       const related = data.category_id
         ? await supabase
             .from("products")
-            .select("id,slug,name,price,compare_at_price,image_url,rating,review_count,condition,brand:brands(name)")
+            .select(
+              "id,slug,name,price,compare_at_price,image_url,rating,review_count,condition,brand:brands(name)",
+            )
             .eq("category_id", data.category_id)
             .neq("id", data.id)
             .limit(4)
@@ -46,7 +58,9 @@ export const Route = createFileRoute("/products/$slug")({
   notFoundComponent: () => (
     <div className="mx-auto max-w-7xl px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Product not found</h1>
-      <Link to="/shop" className="mt-4 inline-block text-sm font-semibold underline">Back to shop</Link>
+      <Link to="/shop" className="mt-4 inline-block text-sm font-semibold underline">
+        Back to shop
+      </Link>
     </div>
   ),
   errorComponent: () => (
@@ -68,7 +82,14 @@ function PDP() {
 
   const addToCart = () => {
     cart.add(
-      { id: p.id, slug: p.slug, name: p.name, price: Number(p.price), image_url: p.image_url, condition: p.condition },
+      {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        price: Number(p.price),
+        image_url: p.image_url,
+        condition: p.condition,
+      },
       qty,
     );
     toast.success("Added to cart", { description: `${qty} × ${p.name}` });
@@ -95,20 +116,32 @@ function PDP() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <nav className="mb-6 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">Home</Link>
+        <Link to="/" className="hover:text-foreground">
+          Home
+        </Link>
         <span className="mx-2">/</span>
-        <Link to="/shop" className="hover:text-foreground">Shop</Link>
+        <Link to="/shop" className="hover:text-foreground">
+          Shop
+        </Link>
         {p.category && (
           <>
             <span className="mx-2">/</span>
-            <Link to="/shop" search={{ category: p.category.slug }} className="hover:text-foreground">{p.category.name}</Link>
+            <Link
+              to="/shop"
+              search={{ category: p.category.slug }}
+              className="hover:text-foreground"
+            >
+              {p.category.name}
+            </Link>
           </>
         )}
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="overflow-hidden rounded-3xl bg-secondary">
-          {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />}
+          {p.image_url && (
+            <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />
+          )}
         </div>
 
         <div>
@@ -126,9 +159,13 @@ function PDP() {
           </div>
 
           <div className="mt-6 flex items-end gap-3">
-            <span className="text-4xl font-bold tracking-tight">{formatPrice(Number(p.price))}</span>
+            <span className="text-4xl font-bold tracking-tight">
+              {formatPrice(Number(p.price))}
+            </span>
             {compare && compare > Number(p.price) && (
-              <span className="pb-1 text-base text-muted-foreground line-through">{formatPrice(compare)}</span>
+              <span className="pb-1 text-base text-muted-foreground line-through">
+                {formatPrice(compare)}
+              </span>
             )}
           </div>
           <p className="mt-2 text-sm text-[color:var(--success)]">
@@ -139,11 +176,17 @@ function PDP() {
 
           <div className="mt-6 flex items-center gap-3">
             <div className="inline-flex items-center rounded-full border border-border bg-card">
-              <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center rounded-l-full hover:bg-secondary">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="grid h-11 w-11 place-items-center rounded-l-full hover:bg-secondary"
+              >
                 <Minus className="h-4 w-4" />
               </button>
               <span className="w-10 text-center text-sm font-semibold">{qty}</span>
-              <button onClick={() => setQty((q) => q + 1)} className="grid h-11 w-11 place-items-center rounded-r-full hover:bg-secondary">
+              <button
+                onClick={() => setQty((q) => q + 1)}
+                className="grid h-11 w-11 place-items-center rounded-r-full hover:bg-secondary"
+              >
                 <Plus className="h-4 w-4" />
               </button>
             </div>
@@ -169,8 +212,15 @@ function PDP() {
                 <Wrench className="h-4 w-4" /> {conditionLabel(p.condition)}
               </h3>
               <ul className="mt-3 space-y-2 text-sm">
-                {["41-point inspection passed", "Cosmetic Grade A — minimal signs of use", "Battery health verified above 85%", "Includes 1-year Voltline warranty"].map((l) => (
-                  <li key={l} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-[color:var(--success)]" /> {l}</li>
+                {[
+                  "41-point inspection passed",
+                  "Cosmetic Grade A — minimal signs of use",
+                  "Battery health verified above 85%",
+                  "Includes 1-year Voltline warranty",
+                ].map((l) => (
+                  <li key={l} className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 text-[color:var(--success)]" /> {l}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -183,7 +233,9 @@ function PDP() {
           </div>
 
           <div className="mt-8 rounded-2xl border border-border">
-            <h3 className="border-b border-border px-5 py-3 text-sm font-semibold">Specifications</h3>
+            <h3 className="border-b border-border px-5 py-3 text-sm font-semibold">
+              Specifications
+            </h3>
             <dl className="divide-y divide-border text-sm">
               {[
                 ["Brand", p.brand?.name],
@@ -192,12 +244,14 @@ function PDP() {
                 ["Memory", p.ram],
                 ["Storage", p.storage],
                 ["SKU", p.id.slice(0, 8).toUpperCase()],
-              ].filter(([, v]) => v).map(([k, v]) => (
-                <div key={k as string} className="grid grid-cols-3 px-5 py-3">
-                  <dt className="text-muted-foreground">{k}</dt>
-                  <dd className="col-span-2 font-medium">{v}</dd>
-                </div>
-              ))}
+              ]
+                .filter(([, v]) => v)
+                .map(([k, v]) => (
+                  <div key={k as string} className="grid grid-cols-3 px-5 py-3">
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd className="col-span-2 font-medium">{v}</dd>
+                  </div>
+                ))}
             </dl>
           </div>
         </div>
@@ -207,7 +261,9 @@ function PDP() {
         <section className="mt-20">
           <h2 className="text-2xl font-bold tracking-tight">You may also like</h2>
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-            {data.related.map((r) => <ProductCard key={r.id} p={r} />)}
+            {data.related.map((r) => (
+              <ProductCard key={r.id} p={r} />
+            ))}
           </div>
         </section>
       )}

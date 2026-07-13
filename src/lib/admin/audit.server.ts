@@ -32,7 +32,10 @@ export async function assertAdmin(supabase: SupabaseClient<Database>, userId: st
 }
 
 export async function assertSuperAdmin(supabase: SupabaseClient<Database>, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" as never });
+  const { data, error } = await supabase.rpc("has_role", {
+    _user_id: userId,
+    _role: "super_admin" as never,
+  });
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Forbidden: super admin access required");
 }

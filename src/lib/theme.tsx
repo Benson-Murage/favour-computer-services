@@ -27,19 +27,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY);
       setThemeState(stored === "dark" ? "dark" : "light");
-    } catch { /* empty */ }
+    } catch {
+      /* empty */
+    }
   }, []);
 
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
-    try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch { /* empty */ }
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, t);
+    } catch {
+      /* empty */
+    }
     const r = document.documentElement;
     r.classList.remove("light", "dark");
     r.classList.add(t);
     r.style.colorScheme = t;
   }, []);
 
-  const toggle = useCallback(() => setTheme(theme === "dark" ? "light" : "dark"), [theme, setTheme]);
+  const toggle = useCallback(
+    () => setTheme(theme === "dark" ? "light" : "dark"),
+    [theme, setTheme],
+  );
 
   return <ThemeCtx.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeCtx.Provider>;
 }

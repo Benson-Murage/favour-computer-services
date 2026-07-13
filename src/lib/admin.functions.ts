@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertAdmin, logAudit } from "./admin/audit.server";
 
 export const claimFirstAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -23,6 +22,8 @@ export const checkIsAdmin = createServerFn({ method: "GET" })
 export const listAuditLog = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    // dynamically import server-only helpers to avoid client-side bundling
+    const { assertAdmin } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("admin_audit_log")
@@ -32,6 +33,3 @@ export const listAuditLog = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
-
-// Re-export for use in other server modules
-export { assertAdmin, logAudit };

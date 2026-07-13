@@ -4,10 +4,27 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { Btn, Card, Field, Input, Label, Modal, Select, Textarea, StatusPill } from "@/components/admin/ui";
+import {
+  Btn,
+  Card,
+  Field,
+  Input,
+  Label,
+  Modal,
+  Select,
+  Textarea,
+  StatusPill,
+} from "@/components/admin/ui";
 import { ImagePreview, ImageUrlField } from "@/components/admin/image-input";
 import { confirmAction } from "@/components/admin/confirm";
-import { listAdminProducts, saveProduct, setProductArchived, deleteProduct, listCategoriesAdmin, listBrandsAdmin } from "@/lib/admin-crud.functions";
+import {
+  listAdminProducts,
+  saveProduct,
+  setProductArchived,
+  deleteProduct,
+  listCategoriesAdmin,
+  listBrandsAdmin,
+} from "@/lib/admin-crud.functions";
 import { formatPrice } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin/products")({ component: ProductsPage });
@@ -23,9 +40,9 @@ function ProductsPage() {
   const arch = useServerFn(setProductArchived);
   const del = useServerFn(deleteProduct);
 
-  const products = useQuery({ queryKey: ["adm","products"], queryFn: () => lp({}) });
-  const cats = useQuery({ queryKey: ["adm","cats"], queryFn: () => lc({}) });
-  const brands = useQuery({ queryKey: ["adm","brands"], queryFn: () => lb({}) });
+  const products = useQuery({ queryKey: ["adm", "products"], queryFn: () => lp({}) });
+  const cats = useQuery({ queryKey: ["adm", "cats"], queryFn: () => lc({}) });
+  const brands = useQuery({ queryKey: ["adm", "brands"], queryFn: () => lb({}) });
 
   const [q, setQ] = useState("");
   const [showArchived, setShowArchived] = useState(false);
@@ -45,12 +62,30 @@ function ProductsPage() {
   return (
     <AdminShell title="Products">
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <Input placeholder="Search products…" value={q} onChange={(e)=>setQ(e.target.value)} className="max-w-xs" />
+        <Input
+          placeholder="Search products…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="max-w-xs"
+        />
         <label className="flex items-center gap-2 text-xs">
-          <input type="checkbox" checked={showArchived} onChange={(e)=>setShowArchived(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={showArchived}
+            onChange={(e) => setShowArchived(e.target.checked)}
+          />
           Show archived
         </label>
-        <div className="ml-auto"><Btn onClick={()=>{ setEdit(null); setCreating(true); }}>+ Add product</Btn></div>
+        <div className="ml-auto">
+          <Btn
+            onClick={() => {
+              setEdit(null);
+              setCreating(true);
+            }}
+          >
+            + Add product
+          </Btn>
+        </div>
       </div>
 
       <Card className="overflow-x-auto p-0">
@@ -68,61 +103,105 @@ function ProductsPage() {
             {filtered.map((p) => {
               const ap = p as Record<string, unknown>;
               return (
-              <tr key={p.id} className="hover:bg-secondary/40">
-                <td className="p-3">
-                  <div className="flex items-center gap-3">
-                    <ImagePreview url={(ap.image_url as string | null) ?? ""} className="h-10 w-10" />
-                    <div>
-                      <div className="font-semibold">{p.name}</div>
-                      <div className="text-[11px] text-muted-foreground">{p.slug} · {String(ap.condition)}</div>
+                <tr key={p.id} className="hover:bg-secondary/40">
+                  <td className="p-3">
+                    <div className="flex items-center gap-3">
+                      <ImagePreview
+                        url={(ap.image_url as string | null) ?? ""}
+                        className="h-10 w-10"
+                      />
+                      <div>
+                        <div className="font-semibold">{p.name}</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {p.slug} · {String(ap.condition)}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="p-3">{formatPrice(Number(ap.price))}</td>
-                <td className="p-3">
-                  {(ap.stock as number) === 0 ? <StatusPill tone="danger">Out</StatusPill>
-                    : (ap.stock as number) <= 3 ? <StatusPill tone="warn">Low · {String(ap.stock)}</StatusPill>
-                    : <span>{String(ap.stock)}</span>}
-                </td>
-                <td className="p-3">
-                  <div className="flex flex-wrap gap-1">
-                    {ap.is_featured ? <StatusPill tone="info">Featured</StatusPill> : null}
-                    {ap.is_new_arrival ? <StatusPill tone="info">New</StatusPill> : null}
-                    {ap.is_best_seller ? <StatusPill tone="success">Best</StatusPill> : null}
-                    {ap.is_on_offer ? <StatusPill tone="warn">Offer</StatusPill> : null}
-                  </div>
-                </td>
-                <td className="p-3">
-                  <div className="flex justify-end gap-1">
-                    <Btn variant="ghost" onClick={()=>{ setCreating(false); setEdit(p); }}>Edit</Btn>
-                    <Btn variant="secondary" onClick={async ()=>{
-                      const ok = await confirmAction({ title: ap.archived_at ? "Restore product?" : "Archive product?", message: p.name, confirmLabel: ap.archived_at ? "Restore" : "Archive" });
-                      if (!ok) return;
-                      await arch({ data: { id: p.id, archived: !ap.archived_at } });
-                      toast.success(ap.archived_at ? "Product restored" : "Product archived");
-                      qc.invalidateQueries({ queryKey: ["adm","products"] });
-                    }}>
-                      {ap.archived_at ? "Restore" : "Archive"}
-                    </Btn>
-                    <Btn variant="danger" onClick={async ()=>{
-                      const ok = await confirmAction({ title: "Delete product permanently?", message: `${p.name} — this cannot be undone.`, confirmLabel: "Delete", tone: "danger" });
-                      if (!ok) return;
-                      await del({ data: { id: p.id } });
-                      toast.success("Product deleted successfully");
-                      qc.invalidateQueries({ queryKey: ["adm","products"] });
-                    }}>Delete</Btn>
-                  </div>
+                  </td>
+                  <td className="p-3">{formatPrice(Number(ap.price))}</td>
+                  <td className="p-3">
+                    {(ap.stock as number) === 0 ? (
+                      <StatusPill tone="danger">Out</StatusPill>
+                    ) : (ap.stock as number) <= 3 ? (
+                      <StatusPill tone="warn">Low · {String(ap.stock)}</StatusPill>
+                    ) : (
+                      <span>{String(ap.stock)}</span>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    <div className="flex flex-wrap gap-1">
+                      {ap.is_featured ? <StatusPill tone="info">Featured</StatusPill> : null}
+                      {ap.is_new_arrival ? <StatusPill tone="info">New</StatusPill> : null}
+                      {ap.is_best_seller ? <StatusPill tone="success">Best</StatusPill> : null}
+                      {ap.is_on_offer ? <StatusPill tone="warn">Offer</StatusPill> : null}
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    <div className="flex justify-end gap-1">
+                      <Btn
+                        variant="ghost"
+                        onClick={() => {
+                          setCreating(false);
+                          setEdit(p);
+                        }}
+                      >
+                        Edit
+                      </Btn>
+                      <Btn
+                        variant="secondary"
+                        onClick={async () => {
+                          const ok = await confirmAction({
+                            title: ap.archived_at ? "Restore product?" : "Archive product?",
+                            message: p.name,
+                            confirmLabel: ap.archived_at ? "Restore" : "Archive",
+                          });
+                          if (!ok) return;
+                          await arch({ data: { id: p.id, archived: !ap.archived_at } });
+                          toast.success(ap.archived_at ? "Product restored" : "Product archived");
+                          qc.invalidateQueries({ queryKey: ["adm", "products"] });
+                        }}
+                      >
+                        {ap.archived_at ? "Restore" : "Archive"}
+                      </Btn>
+                      <Btn
+                        variant="danger"
+                        onClick={async () => {
+                          const ok = await confirmAction({
+                            title: "Delete product permanently?",
+                            message: `${p.name} — this cannot be undone.`,
+                            confirmLabel: "Delete",
+                            tone: "danger",
+                          });
+                          if (!ok) return;
+                          await del({ data: { id: p.id } });
+                          toast.success("Product deleted successfully");
+                          qc.invalidateQueries({ queryKey: ["adm", "products"] });
+                        }}
+                      >
+                        Delete
+                      </Btn>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={5} className="p-6 text-center text-sm text-muted-foreground">
+                  No products.
                 </td>
               </tr>
-            )})}
-            {filtered.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-sm text-muted-foreground">No products.</td></tr>}
+            )}
           </tbody>
         </table>
       </Card>
 
       <Modal
         open={creating || !!edit}
-        onClose={() => { setEdit(null); setCreating(false); }}
+        onClose={() => {
+          setEdit(null);
+          setCreating(false);
+        }}
         title={edit ? `Edit · ${edit.name}` : "New product"}
       >
         <ProductForm
@@ -133,9 +212,12 @@ function ProductsPage() {
             try {
               await save({ data: payload as Parameters<typeof save>[0]["data"] });
               toast.success("Saved");
-              setEdit(null); setCreating(false);
-              qc.invalidateQueries({ queryKey: ["adm","products"] });
-            } catch (e) { toast.error((e as Error).message); }
+              setEdit(null);
+              setCreating(false);
+              qc.invalidateQueries({ queryKey: ["adm", "products"] });
+            } catch (e) {
+              toast.error((e as Error).message);
+            }
           }}
         />
       </Modal>
@@ -143,7 +225,12 @@ function ProductsPage() {
   );
 }
 
-function ProductForm({ initial, categories, brands, onSave }: {
+function ProductForm({
+  initial,
+  categories,
+  brands,
+  onSave,
+}: {
   initial: AnyProduct | null;
   categories: Array<{ id: string; name: string }>;
   brands: Array<{ id: string; name: string }>;
@@ -178,46 +265,118 @@ function ProductForm({ initial, categories, brands, onSave }: {
   });
   const set = (k: string, v: unknown) => setForm((s) => ({ ...s, [k]: v }));
   return (
-    <form onSubmit={(e)=>{ e.preventDefault(); const payload = { ...form };
-      ["compare_at_price","offer_percent","offer_price"].forEach(k => { if (payload[k]==="" || payload[k]==null) delete payload[k]; });
-      ["category_id","brand_id","offer_starts_at","offer_ends_at"].forEach(k => { if (payload[k]==="" || payload[k]==null) payload[k] = null; });
-      onSave(payload);
-    }} className="grid gap-3">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const payload = { ...form };
+        ["compare_at_price", "offer_percent", "offer_price"].forEach((k) => {
+          if (payload[k] === "" || payload[k] == null) delete payload[k];
+        });
+        ["category_id", "brand_id", "offer_starts_at", "offer_ends_at"].forEach((k) => {
+          if (payload[k] === "" || payload[k] == null) payload[k] = null;
+        });
+        onSave(payload);
+      }}
+      className="grid gap-3"
+    >
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Name"><Input value={String(form.name)} onChange={(e)=>set("name", e.target.value)} required /></Field>
-        <Field label="Slug"><Input value={String(form.slug)} onChange={(e)=>set("slug", e.target.value)} required /></Field>
+        <Field label="Name">
+          <Input value={String(form.name)} onChange={(e) => set("name", e.target.value)} required />
+        </Field>
+        <Field label="Slug">
+          <Input value={String(form.slug)} onChange={(e) => set("slug", e.target.value)} required />
+        </Field>
       </div>
-      <Field label="Description"><Textarea rows={3} value={String(form.description ?? "")} onChange={(e)=>set("description", e.target.value)} /></Field>
+      <Field label="Description">
+        <Textarea
+          rows={3}
+          value={String(form.description ?? "")}
+          onChange={(e) => set("description", e.target.value)}
+        />
+      </Field>
       <div className="grid gap-3 sm:grid-cols-3">
-        <Field label="Price (KES)"><Input type="number" step="0.01" value={String(form.price)} onChange={(e)=>set("price", e.target.value)} /></Field>
-        <Field label="Compare-at"><Input type="number" step="0.01" value={String(form.compare_at_price)} onChange={(e)=>set("compare_at_price", e.target.value)} /></Field>
-        <Field label="Stock"><Input type="number" value={String(form.stock)} onChange={(e)=>set("stock", e.target.value)} /></Field>
+        <Field label="Price (KES)">
+          <Input
+            type="number"
+            step="0.01"
+            value={String(form.price)}
+            onChange={(e) => set("price", e.target.value)}
+          />
+        </Field>
+        <Field label="Compare-at">
+          <Input
+            type="number"
+            step="0.01"
+            value={String(form.compare_at_price)}
+            onChange={(e) => set("compare_at_price", e.target.value)}
+          />
+        </Field>
+        <Field label="Stock">
+          <Input
+            type="number"
+            value={String(form.stock)}
+            onChange={(e) => set("stock", e.target.value)}
+          />
+        </Field>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <Field label="Condition">
-          <Select value={String(form.condition)} onChange={(e)=>set("condition", e.target.value)}>
-            <option value="new">New</option><option value="refurbished">Refurbished</option>
+          <Select value={String(form.condition)} onChange={(e) => set("condition", e.target.value)}>
+            <option value="new">New</option>
+            <option value="refurbished">Refurbished</option>
           </Select>
         </Field>
         <Field label="Category">
-          <Select value={String(form.category_id ?? "")} onChange={(e)=>set("category_id", e.target.value)}>
+          <Select
+            value={String(form.category_id ?? "")}
+            onChange={(e) => set("category_id", e.target.value)}
+          >
             <option value="">—</option>
-            {categories.map((c)=><option key={c.id} value={c.id}>{c.name}</option>)}
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
           </Select>
         </Field>
         <Field label="Brand">
-          <Select value={String(form.brand_id ?? "")} onChange={(e)=>set("brand_id", e.target.value)}>
+          <Select
+            value={String(form.brand_id ?? "")}
+            onChange={(e) => set("brand_id", e.target.value)}
+          >
             <option value="">—</option>
-            {brands.map((b)=><option key={b.id} value={b.id}>{b.name}</option>)}
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
           </Select>
         </Field>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
-        <Field label="RAM"><Input value={String(form.ram ?? "")} onChange={(e)=>set("ram", e.target.value)} /></Field>
-        <Field label="Storage"><Input value={String(form.storage ?? "")} onChange={(e)=>set("storage", e.target.value)} /></Field>
-        <Field label="Processor"><Input value={String(form.processor ?? "")} onChange={(e)=>set("processor", e.target.value)} /></Field>
+        <Field label="RAM">
+          <Input value={String(form.ram ?? "")} onChange={(e) => set("ram", e.target.value)} />
+        </Field>
+        <Field label="Storage">
+          <Input
+            value={String(form.storage ?? "")}
+            onChange={(e) => set("storage", e.target.value)}
+          />
+        </Field>
+        <Field label="Processor">
+          <Input
+            value={String(form.processor ?? "")}
+            onChange={(e) => set("processor", e.target.value)}
+          />
+        </Field>
       </div>
-      <Field label="Warranty"><Input value={String(form.warranty ?? "")} onChange={(e)=>set("warranty", e.target.value)} placeholder="e.g. 1 year manufacturer warranty" /></Field>
+      <Field label="Warranty">
+        <Input
+          value={String(form.warranty ?? "")}
+          onChange={(e) => set("warranty", e.target.value)}
+          placeholder="e.g. 1 year manufacturer warranty"
+        />
+      </Field>
       <ImageUrlField
         label="Featured image"
         bucket="product-images"
@@ -228,31 +387,69 @@ function ProductForm({ initial, categories, brands, onSave }: {
       <ImageUrlList
         urls={(form.image_urls as string[]) ?? []}
         featured={String(form.image_url ?? "")}
-        onChange={(next)=>set("image_urls", next)}
-        onFeature={(u)=>set("image_url", u)}
+        onChange={(next) => set("image_urls", next)}
+        onFeature={(u) => set("image_url", u)}
       />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {(["is_featured","is_new_arrival","is_best_seller","is_on_offer"] as const).map((k) => (
-          <label key={k} className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 text-xs">
-            <input type="checkbox" checked={Boolean(form[k])} onChange={(e)=>set(k, e.target.checked)} />
-            {k.replace("is_","").replace("_"," ")}
+        {(["is_featured", "is_new_arrival", "is_best_seller", "is_on_offer"] as const).map((k) => (
+          <label
+            key={k}
+            className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 text-xs"
+          >
+            <input
+              type="checkbox"
+              checked={Boolean(form[k])}
+              onChange={(e) => set(k, e.target.checked)}
+            />
+            {k.replace("is_", "").replace("_", " ")}
           </label>
         ))}
       </div>
       {Boolean(form.is_on_offer) && (
         <div className="grid gap-3 rounded-xl border border-border bg-secondary/40 p-3 sm:grid-cols-4">
-          <Field label="Offer %"><Input type="number" value={String(form.offer_percent ?? "")} onChange={(e)=>set("offer_percent", e.target.value)} /></Field>
-          <Field label="Offer price"><Input type="number" value={String(form.offer_price ?? "")} onChange={(e)=>set("offer_price", e.target.value)} /></Field>
-          <Field label="Starts"><Input type="datetime-local" value={String(form.offer_starts_at ?? "")} onChange={(e)=>set("offer_starts_at", e.target.value)} /></Field>
-          <Field label="Ends"><Input type="datetime-local" value={String(form.offer_ends_at ?? "")} onChange={(e)=>set("offer_ends_at", e.target.value)} /></Field>
+          <Field label="Offer %">
+            <Input
+              type="number"
+              value={String(form.offer_percent ?? "")}
+              onChange={(e) => set("offer_percent", e.target.value)}
+            />
+          </Field>
+          <Field label="Offer price">
+            <Input
+              type="number"
+              value={String(form.offer_price ?? "")}
+              onChange={(e) => set("offer_price", e.target.value)}
+            />
+          </Field>
+          <Field label="Starts">
+            <Input
+              type="datetime-local"
+              value={String(form.offer_starts_at ?? "")}
+              onChange={(e) => set("offer_starts_at", e.target.value)}
+            />
+          </Field>
+          <Field label="Ends">
+            <Input
+              type="datetime-local"
+              value={String(form.offer_ends_at ?? "")}
+              onChange={(e) => set("offer_ends_at", e.target.value)}
+            />
+          </Field>
         </div>
       )}
-      <div className="flex justify-end gap-2 pt-2"><Btn type="submit">Save product</Btn></div>
+      <div className="flex justify-end gap-2 pt-2">
+        <Btn type="submit">Save product</Btn>
+      </div>
     </form>
   );
 }
 
-function ImageUrlList({ urls, featured, onChange, onFeature }: {
+function ImageUrlList({
+  urls,
+  featured,
+  onChange,
+  onFeature,
+}: {
   urls: string[];
   featured: string;
   onChange: (next: string[]) => void;
@@ -262,7 +459,10 @@ function ImageUrlList({ urls, featured, onChange, onFeature }: {
   const add = () => {
     const u = draft.trim();
     if (!u) return;
-    if (urls.includes(u)) { setDraft(""); return; }
+    if (urls.includes(u)) {
+      setDraft("");
+      return;
+    }
     onChange([...urls, u]);
     setDraft("");
   };
@@ -277,23 +477,49 @@ function ImageUrlList({ urls, featured, onChange, onFeature }: {
   return (
     <div>
       <Label>Additional image URLs</Label>
-      <p className="mt-1 text-[11px] text-muted-foreground">Paste image links from manufacturer, supplier, CDN, or hosting sites. Set any as the featured image.</p>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        Paste image links from manufacturer, supplier, CDN, or hosting sites. Set any as the
+        featured image.
+      </p>
       <div className="mt-2 flex gap-2">
-        <Input value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder="https://example.com/very-long-cdn-image-url.jpg" />
-        <Btn variant="secondary" onClick={add}>Add</Btn>
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="https://example.com/very-long-cdn-image-url.jpg"
+        />
+        <Btn variant="secondary" onClick={add}>
+          Add
+        </Btn>
       </div>
       {urls.length > 0 && (
         <ul className="mt-3 grid gap-2">
           {urls.map((u, i) => (
-            <li key={u} className="flex items-center gap-3 rounded-lg border border-border bg-card p-2">
+            <li
+              key={u}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card p-2"
+            >
               <ImagePreview url={u} className="h-10 w-10" />
-              <span className="flex-1 truncate text-xs" title={u}>{u}</span>
-              {featured === u
-                ? <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase text-background">Featured</span>
-                : <Btn variant="ghost" onClick={()=>onFeature(u)}>Set featured</Btn>}
-              <Btn variant="ghost" onClick={()=>move(i,-1)}>↑</Btn>
-              <Btn variant="ghost" onClick={()=>move(i, 1)}>↓</Btn>
-              <Btn variant="danger" onClick={()=>remove(u)}>Remove</Btn>
+              <span className="flex-1 truncate text-xs" title={u}>
+                {u}
+              </span>
+              {featured === u ? (
+                <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase text-background">
+                  Featured
+                </span>
+              ) : (
+                <Btn variant="ghost" onClick={() => onFeature(u)}>
+                  Set featured
+                </Btn>
+              )}
+              <Btn variant="ghost" onClick={() => move(i, -1)}>
+                ↑
+              </Btn>
+              <Btn variant="ghost" onClick={() => move(i, 1)}>
+                ↓
+              </Btn>
+              <Btn variant="danger" onClick={() => remove(u)}>
+                Remove
+              </Btn>
             </li>
           ))}
         </ul>

@@ -3,8 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { notifyBoth, OWNER_EMAIL } from "./notify.server";
-import { assertAdmin, logAudit } from "./admin/audit.server";
 
 const ItemSchema = z.object({
   product_id: z.string().uuid(),
@@ -84,27 +82,38 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     // Decrement stock
     for (const it of data.items) {
-      const { data: prod } = await supabase.from("products").select("stock").eq("id", it.product_id).single();
+      const { data: prod } = await supabase
+        .from("products")
+        .select("stock")
+        .eq("id", it.product_id)
+        .single();
       const newStock = Math.max(0, (prod?.stock ?? 0) - it.qty);
       await supabase.from("products").update({ stock: newStock }).eq("id", it.product_id);
       await supabase.from("inventory_movements").insert({
-        product_id: it.product_id, delta: -it.qty, reason: "order", reference_id: order.id, admin_id: null,
+        product_id: it.product_id,
+        delta: -it.qty,
+        reason: "order",
+        reference_id: order.id,
+        admin_id: null,
       });
     }
 
     // Email + notification trail
     const summary = data.items.map((it) => `• ${it.name} × ${it.qty}`).join("\n");
-    await notifyBoth(supabase, {
-      customerEmail: data.customer_email,
-      customerUserId: userId,
-      kind: "order-placed",
-      adminSubject: `New order ${invoice_number} — KES ${total.toLocaleString()}`,
-      adminBody: `New order from ${data.customer_name} (${data.customer_email}, ${data.customer_phone}).\nFulfillment: ${data.fulfillment}${isPickup ? ` (Reservation ${reservation_number}, code ${pickup_code})` : ""}\n\n${summary}\n\nTotal: KES ${total.toLocaleString()}`,
-      customerSubject: `We received your order ${invoice_number}`,
-      customerBody: `Hi ${data.customer_name},\n\nThanks for your order with Favour Computer Services.\nYour reference is ${invoice_number}.\n\n${summary}\n\nTotal: KES ${total.toLocaleString()}\n\nNext step: upload your proof of payment from your account so we can verify and prepare your order.\n\nFavour Computer Services\n0726 548 592 — F&F Building, Shop U13, Nairobi`,
-      relatedType: "order",
-      relatedId: order.id,
-    });
+    {
+      const { notifyBoth } = await import("./notify.server");
+      await notifyBoth(supabase, {
+        customerEmail: data.customer_email,
+        customerUserId: userId,
+        kind: "order-placed",
+        adminSubject: `New order ${invoice_number} — KES ${total.toLocaleString()}`,
+        adminBody: `New order from ${data.customer_name} (${data.customer_email}, ${data.customer_phone}).\nFulfillment: ${data.fulfillment}${isPickup ? ` (Reservation ${reservation_number}, code ${pickup_code})` : ""}\n\n${summary}\n\nTotal: KES ${total.toLocaleString()}`,
+        customerSubject: `We received your order ${invoice_number}`,
+        customerBody: `Hi ${data.customer_name},\n\nThanks for your order with Favour Computer Services.\nYour reference is ${invoice_number}.\n\n${summary}\n\nTotal: KES ${total.toLocaleString()}\n\nNext step: upload your proof of payment from your account so we can verify and prepare your order.\n\nFavour Computer Services\n0726 548 592 — F&F Building, Shop U13, Nairobi`,
+        relatedType: "order",
+        relatedId: order.id,
+      });
+    }
 
     return { ...order, invoice_number };
   });
@@ -117,7 +126,9 @@ export const listMyOrders = createServerFn({ method: "GET" })
     const email = (context.claims?.email as string | undefined) ?? "";
     const { data, error } = await context.supabase
       .from("orders")
-      .select("id, invoice_number, created_at, total, status, payment_status, fulfillment, reservation_number, pickup_code, items, customer_email")
+      .select(
+        "id, invoice_number, created_at, total, status, payment_status, fulfillment, reservation_number, pickup_code, items, customer_email",
+      )
       .or(`user_id.eq.${context.userId}${email ? `,customer_email.ilike.${email}` : ""}`)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -153,8 +164,8 @@ export const getMyOrder = createServerFn({ method: "GET" })
 
 const UpdateOrderInput = z.object({
   id: z.string().uuid(),
-  status: z.enum(["pending","paid","ready","picked_up","delivered","cancelled"]).optional(),
-  payment_status: z.enum(["unpaid","awaiting_verification","paid","refunded"]).optional(),
+  status: z.enum(["pending", "paid", "ready", "picked_up", "delivered", "cancelled"]).optional(),
+  payment_status: z.enum(["unpaid", "awaiting_verification", "paid", "refunded"]).optional(),
   notes: z.string().max(5000).optional(),
 });
 
@@ -162,31 +173,56 @@ export const adminUpdateOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: z.infer<typeof UpdateOrderInput>) => UpdateOrderInput.parse(d))
   .handler(async ({ data, context }) => {
+    const { assertAdmin, logAudit } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
     const { id, ...patch } = data;
     const { data: updated, error } = await context.supabase
-      .from("orders").update(patch as never).eq("id", id).select("customer_email, customer_name, invoice_number, user_id").single();
+      .from("orders")
+      .update(patch as never)
+      .eq("id", id)
+      .select("customer_email, customer_name, invoice_number, user_id")
+      .single();
     if (error) throw new Error(error.message);
     await logAudit(context.supabase, {
-      adminId: context.userId, adminEmail: context.claims?.email ?? "",
-      action: "update", entity: "order", entityId: id, details: patch,
+      adminId: context.userId,
+      adminEmail: context.claims?.email ?? "",
+      action: "update",
+      entity: "order",
+      entityId: id,
+      details: patch,
     });
     // Notify customer about meaningful status flips
     const kinds: Record<string, { subj: string; body: string }> = {
-      ready: { subj: `Your order ${updated.invoice_number} is ready for pickup`, body: `Hi ${updated.customer_name},\n\nYour order ${updated.invoice_number} is ready for pickup at F&F Building, Shop U13, Nairobi.` },
-      delivered: { subj: `Your order ${updated.invoice_number} was delivered`, body: `Hi ${updated.customer_name},\n\nWe've marked order ${updated.invoice_number} as delivered. Enjoy!` },
-      picked_up: { subj: `Order ${updated.invoice_number} picked up`, body: `Hi ${updated.customer_name},\n\nThanks for collecting order ${updated.invoice_number} at our shop.` },
-      cancelled: { subj: `Order ${updated.invoice_number} cancelled`, body: `Hi ${updated.customer_name},\n\nYour order ${updated.invoice_number} has been cancelled.` },
+      ready: {
+        subj: `Your order ${updated.invoice_number} is ready for pickup`,
+        body: `Hi ${updated.customer_name},\n\nYour order ${updated.invoice_number} is ready for pickup at F&F Building, Shop U13, Nairobi.`,
+      },
+      delivered: {
+        subj: `Your order ${updated.invoice_number} was delivered`,
+        body: `Hi ${updated.customer_name},\n\nWe've marked order ${updated.invoice_number} as delivered. Enjoy!`,
+      },
+      picked_up: {
+        subj: `Order ${updated.invoice_number} picked up`,
+        body: `Hi ${updated.customer_name},\n\nThanks for collecting order ${updated.invoice_number} at our shop.`,
+      },
+      cancelled: {
+        subj: `Order ${updated.invoice_number} cancelled`,
+        body: `Hi ${updated.customer_name},\n\nYour order ${updated.invoice_number} has been cancelled.`,
+      },
     };
     if (patch.status && kinds[patch.status]) {
       const k = kinds[patch.status];
+      const { notifyBoth } = await import("./notify.server");
       await notifyBoth(context.supabase, {
-        customerEmail: updated.customer_email, customerUserId: updated.user_id,
+        customerEmail: updated.customer_email,
+        customerUserId: updated.user_id,
         kind: `order-${patch.status}`,
         adminSubject: `Order ${updated.invoice_number} → ${patch.status}`,
         adminBody: `Status changed by admin to ${patch.status}.`,
-        customerSubject: k.subj, customerBody: k.body,
-        relatedType: "order", relatedId: id,
+        customerSubject: k.subj,
+        customerBody: k.body,
+        relatedType: "order",
+        relatedId: id,
       });
     }
     return { ok: true };
@@ -195,10 +231,13 @@ export const adminUpdateOrder = createServerFn({ method: "POST" })
 export const adminListOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { assertAdmin } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
-    const { data, error } = await context.supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(500);
+    const { data, error } = await context.supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
     if (error) throw new Error(error.message);
     return data ?? [];
   });
-
-export { OWNER_EMAIL };

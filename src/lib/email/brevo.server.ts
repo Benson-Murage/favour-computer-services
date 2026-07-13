@@ -87,7 +87,9 @@ export async function sendViaBrevo(params: {
         try {
           const j = JSON.parse(text);
           messageId = j.messageId ?? j.messageIds?.[0];
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
         return { ok: true, messageId, status: res.status };
       }
       lastErr = `HTTP ${res.status}: ${text.slice(0, 500)}`;

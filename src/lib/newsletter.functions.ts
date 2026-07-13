@@ -13,19 +13,21 @@ const SubInput = z.object({
 });
 
 function admin() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 
 export const subscribeNewsletter = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof SubInput>) => SubInput.parse(d))
   .handler(async ({ data }) => {
     const supabase = admin();
-    const { error } = await supabase.from("newsletter_subscribers")
-      .upsert({ email: data.email.toLowerCase(), name: data.name || null, source: data.source }, { onConflict: "email" });
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .upsert(
+        { email: data.email.toLowerCase(), name: data.name || null, source: data.source },
+        { onConflict: "email" },
+      );
     if (error) throw new Error(error.message);
 
     await recordEmail(supabase, {
@@ -48,7 +50,10 @@ export const adminListSubscribers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("newsletter_subscribers").select("*").order("created_at", { ascending: false }).limit(1000);
+      .from("newsletter_subscribers")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1000);
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -58,7 +63,10 @@ export const adminDeleteSubscriber = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await context.supabase.from("newsletter_subscribers").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("newsletter_subscribers")
+      .delete()
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

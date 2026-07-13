@@ -8,7 +8,10 @@ export const Route = createFileRoute("/offline")({
   head: () => ({
     meta: [
       { title: "You're offline — Favour Computer Services" },
-      { name: "description", content: "You are currently offline. Reconnect to continue shopping." },
+      {
+        name: "description",
+        content: "You are currently offline. Reconnect to continue shopping.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),

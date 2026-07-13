@@ -15,7 +15,13 @@ const SIZE: Record<NonNullable<Props["size"]>, string> = {
   lg: "h-14",
 };
 
-export function Logo({ className = "", imgClassName = "", href = "/", showWordmark = false, size = "md" }: Props) {
+export function Logo({
+  className = "",
+  imgClassName = "",
+  href = "/",
+  showWordmark = false,
+  size = "md",
+}: Props) {
   const inner = (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <img
@@ -28,7 +34,9 @@ export function Logo({ className = "", imgClassName = "", href = "/", showWordma
       {showWordmark && (
         <span className="flex flex-col leading-none">
           <span className="text-sm font-bold tracking-tight">Favour Computer</span>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Services · Nairobi</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Services · Nairobi
+          </span>
         </span>
       )}
     </span>

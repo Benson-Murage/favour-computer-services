@@ -55,7 +55,10 @@ export const saveProduct = createServerFn({ method: "POST" })
     delete payload.id;
     let id = data.id;
     if (id) {
-      const { error } = await context.supabase.from("products").update(payload as never).eq("id", id);
+      const { error } = await context.supabase
+        .from("products")
+        .update(payload as never)
+        .eq("id", id);
       if (error) throw new Error(error.message);
     } else {
       const { data: row, error } = await context.supabase
@@ -88,8 +91,11 @@ export const setProductArchived = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     await logAudit(context.supabase, {
-      adminId: context.userId, adminEmail: context.claims?.email ?? "",
-      action: data.archived ? "archive" : "restore", entity: "product", entityId: data.id,
+      adminId: context.userId,
+      adminEmail: context.claims?.email ?? "",
+      action: data.archived ? "archive" : "restore",
+      entity: "product",
+      entityId: data.id,
     });
     return { ok: true };
   });
@@ -102,8 +108,11 @@ export const deleteProduct = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("products").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     await logAudit(context.supabase, {
-      adminId: context.userId, adminEmail: context.claims?.email ?? "",
-      action: "delete", entity: "product", entityId: data.id,
+      adminId: context.userId,
+      adminEmail: context.claims?.email ?? "",
+      action: "delete",
+      entity: "product",
+      entityId: data.id,
     });
     return { ok: true };
   });
@@ -123,7 +132,10 @@ export const listCategoriesAdmin = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("categories").select("*").order("sort_order").order("name");
+      .from("categories")
+      .select("*")
+      .order("sort_order")
+      .order("name");
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -139,7 +151,11 @@ export const saveCategory = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id };
     }
-    const { data: row, error } = await context.supabase.from("categories").insert(data).select("id").single();
+    const { data: row, error } = await context.supabase
+      .from("categories")
+      .insert(data)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -168,7 +184,11 @@ export const listBrandsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { data, error } = await context.supabase.from("brands").select("*").order("sort_order").order("name");
+    const { data, error } = await context.supabase
+      .from("brands")
+      .select("*")
+      .order("sort_order")
+      .order("name");
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -184,7 +204,11 @@ export const saveBrand = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id };
     }
-    const { data: row, error } = await context.supabase.from("brands").insert(data).select("id").single();
+    const { data: row, error } = await context.supabase
+      .from("brands")
+      .insert(data)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -207,11 +231,16 @@ export const adjustStock = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data: prod, error: e1 } = await context.supabase
-      .from("products").select("stock, name").eq("id", data.product_id).single();
+      .from("products")
+      .select("stock, name")
+      .eq("id", data.product_id)
+      .single();
     if (e1) throw new Error(e1.message);
     const newStock = Math.max(0, (prod.stock ?? 0) + data.delta);
     const { error: e2 } = await context.supabase
-      .from("products").update({ stock: newStock }).eq("id", data.product_id);
+      .from("products")
+      .update({ stock: newStock })
+      .eq("id", data.product_id);
     if (e2) throw new Error(e2.message);
     const { error: e3 } = await context.supabase.from("inventory_movements").insert({
       product_id: data.product_id,
@@ -221,8 +250,11 @@ export const adjustStock = createServerFn({ method: "POST" })
     });
     if (e3) throw new Error(e3.message);
     await logAudit(context.supabase, {
-      adminId: context.userId, adminEmail: context.claims?.email ?? "",
-      action: "stock_adjust", entity: "product", entityId: data.product_id,
+      adminId: context.userId,
+      adminEmail: context.claims?.email ?? "",
+      action: "stock_adjust",
+      entity: "product",
+      entityId: data.product_id,
       details: { delta: data.delta, new_stock: newStock, reason: data.reason },
     });
     return { stock: newStock };
@@ -245,7 +277,7 @@ export const inventoryHistory = createServerFn({ method: "GET" })
 
 const PackageInput = z.object({
   id: z.string().uuid().optional(),
-  kind: z.enum(["cctv","livestream"]),
+  kind: z.enum(["cctv", "livestream"]),
   name: z.string().min(1).max(120),
   tagline: z.string().max(200).optional().default(""),
   price: z.coerce.number().optional().nullable(),
@@ -262,7 +294,10 @@ export const listPackagesAdmin = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("service_packages").select("*").order("kind").order("sort_order");
+      .from("service_packages")
+      .select("*")
+      .order("kind")
+      .order("sort_order");
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -272,15 +307,26 @@ export const savePackage = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof PackageInput>) => PackageInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const payload = { ...data, features: data.features as never, equipment: data.equipment as never };
+    const payload = {
+      ...data,
+      features: data.features as never,
+      equipment: data.equipment as never,
+    };
     if (data.id) {
       const { id, ...rest } = payload;
-      const { error } = await context.supabase.from("service_packages").update(rest as never).eq("id", id!);
+      const { error } = await context.supabase
+        .from("service_packages")
+        .update(rest as never)
+        .eq("id", id!);
       if (error) throw new Error(error.message);
       return { id };
     }
     delete (payload as { id?: string }).id;
-    const { data: row, error } = await context.supabase.from("service_packages").insert(payload as never).select("id").single();
+    const { data: row, error } = await context.supabase
+      .from("service_packages")
+      .insert(payload as never)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -313,7 +359,9 @@ export const listPromotionsAdmin = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("promotions").select("*, products(name, slug)").order("created_at", { ascending: false });
+      .from("promotions")
+      .select("*, products(name, slug)")
+      .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -325,13 +373,20 @@ export const savePromotion = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     if (data.id) {
       const { id, ...rest } = data;
-      const { error } = await context.supabase.from("promotions").update(rest as never).eq("id", id);
+      const { error } = await context.supabase
+        .from("promotions")
+        .update(rest as never)
+        .eq("id", id);
       if (error) throw new Error(error.message);
       return { id };
     }
     const { id: _omit, ...insertData } = data;
     void _omit;
-    const { data: row, error } = await context.supabase.from("promotions").insert(insertData as never).select("id").single();
+    const { data: row, error } = await context.supabase
+      .from("promotions")
+      .insert(insertData as never)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -353,21 +408,36 @@ export const listOrders = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("orders").select("*").order("created_at", { ascending: false }).limit(500);
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
     if (error) throw new Error(error.message);
     return data ?? [];
   });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; status: "pending"|"paid"|"ready"|"picked_up"|"delivered"|"cancelled" }) => d)
+  .inputValidator(
+    (d: {
+      id: string;
+      status: "pending" | "paid" | "ready" | "picked_up" | "delivered" | "cancelled";
+    }) => d,
+  )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await context.supabase.from("orders").update({ status: data.status }).eq("id", data.id);
+    const { error } = await context.supabase
+      .from("orders")
+      .update({ status: data.status })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     await logAudit(context.supabase, {
-      adminId: context.userId, adminEmail: context.claims?.email ?? "",
-      action: "status", entity: "order", entityId: data.id, details: { status: data.status },
+      adminId: context.userId,
+      adminEmail: context.claims?.email ?? "",
+      action: "status",
+      entity: "order",
+      entityId: data.id,
+      details: { status: data.status },
     });
     return { ok: true };
   });
@@ -377,9 +447,17 @@ export const adminGetOrder = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { data: order, error } = await context.supabase.from("orders").select("*").eq("id", data.id).maybeSingle();
+    const { data: order, error } = await context.supabase
+      .from("orders")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     if (!order) throw new Error("Order not found");
-    const { data: payments } = await context.supabase.from("payments").select("*").eq("order_id", data.id).order("created_at", { ascending: false });
+    const { data: payments } = await context.supabase
+      .from("payments")
+      .select("*")
+      .eq("order_id", data.id)
+      .order("created_at", { ascending: false });
     return { order, payments: payments ?? [] };
   });

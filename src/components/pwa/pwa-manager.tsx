@@ -35,7 +35,9 @@ export function PWAManager() {
       try {
         const dismissed = localStorage.getItem(INSTALL_DISMISSED_KEY);
         if (dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
-      } catch { /* empty */ }
+      } catch {
+        /* empty */
+      }
       // Detect standalone / installed → skip banner
       const standalone =
         window.matchMedia("(display-mode: standalone)").matches ||
@@ -65,7 +67,11 @@ export function PWAManager() {
 
   const dismiss = () => {
     setShowBanner(false);
-    try { localStorage.setItem(INSTALL_DISMISSED_KEY, String(Date.now())); } catch { /* empty */ }
+    try {
+      localStorage.setItem(INSTALL_DISMISSED_KEY, String(Date.now()));
+    } catch {
+      /* empty */
+    }
   };
 
   if (!showBanner || !installEvent) return null;
@@ -149,9 +155,7 @@ export function InstallButton({ className = "" }: { className?: string }) {
 
 // Small reconnect hook for the offline page.
 export function useOnlineStatus() {
-  const [online, setOnline] = useState(
-    typeof navigator === "undefined" ? true : navigator.onLine,
-  );
+  const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
   useEffect(() => {
     const up = () => setOnline(true);
     const down = () => setOnline(false);

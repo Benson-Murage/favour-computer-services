@@ -6,20 +6,25 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/product-card";
 
-const search = z.object({
-  q: z.string().optional(),
-  category: z.string().optional(),
-  brand: z.string().optional(),
-  condition: z.string().optional(), // "refurb" or specific
-  sort: z.enum(["newest", "price_asc", "price_desc", "rating"]).optional(),
-}).partial();
+const search = z
+  .object({
+    q: z.string().optional(),
+    category: z.string().optional(),
+    brand: z.string().optional(),
+    condition: z.string().optional(), // "refurb" or specific
+    sort: z.enum(["newest", "price_asc", "price_desc", "rating"]).optional(),
+  })
+  .partial();
 
 export const Route = createFileRoute("/shop")({
   validateSearch: search,
   head: () => ({
     meta: [
       { title: "Shop — Voltline" },
-      { name: "description", content: "Browse new and refurbished laptops, phones, components, and more." },
+      {
+        name: "description",
+        content: "Browse new and refurbished laptops, phones, components, and more.",
+      },
     ],
     links: [{ rel: "canonical", href: "/shop" }],
   }),
@@ -46,7 +51,9 @@ function Shop() {
     queryFn: async () => {
       let q = supabase
         .from("products")
-        .select("id,slug,name,price,compare_at_price,image_url,rating,review_count,condition,category:categories!inner(slug),brand:brands!inner(slug,name)");
+        .select(
+          "id,slug,name,price,compare_at_price,image_url,rating,review_count,condition,category:categories!inner(slug),brand:brands!inner(slug,name)",
+        );
 
       if (sp.category) q = q.eq("category.slug", sp.category);
       if (sp.brand) q = q.eq("brand.slug", sp.brand);
@@ -55,10 +62,17 @@ function Shop() {
       if (sp.q) q = q.ilike("name", `%${sp.q}%`);
 
       switch (sp.sort) {
-        case "price_asc": q = q.order("price", { ascending: true }); break;
-        case "price_desc": q = q.order("price", { ascending: false }); break;
-        case "rating": q = q.order("rating", { ascending: false }); break;
-        default: q = q.order("created_at", { ascending: false });
+        case "price_asc":
+          q = q.order("price", { ascending: true });
+          break;
+        case "price_desc":
+          q = q.order("price", { ascending: false });
+          break;
+        case "rating":
+          q = q.order("rating", { ascending: false });
+          break;
+        default:
+          q = q.order("created_at", { ascending: false });
       }
       const { data } = await q.limit(60);
       return (data ?? []) as unknown as ProductCardData[];
@@ -67,7 +81,8 @@ function Shop() {
 
   const title = useMemo(() => {
     if (sp.condition === "refurb") return "Refurbished";
-    if (sp.category) return meta.data?.categories.find((c) => c.slug === sp.category)?.name ?? "Shop";
+    if (sp.category)
+      return meta.data?.categories.find((c) => c.slug === sp.category)?.name ?? "Shop";
     if (sp.q) return `Results for "${sp.q}"`;
     return "All products";
   }, [sp, meta.data]);
@@ -76,7 +91,9 @@ function Shop() {
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <header className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Catalog</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Catalog
+          </p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {products.data?.length ?? 0} products
@@ -107,12 +124,18 @@ function Shop() {
             </div>
           ) : products.data && products.data.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-              {products.data.map((p) => <ProductCard key={p.id} p={p} />)}
+              {products.data.map((p) => (
+                <ProductCard key={p.id} p={p} />
+              ))}
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border p-12 text-center">
               <p className="text-sm text-muted-foreground">No products match your filters.</p>
-              <Link to="/shop" search={{}} className="mt-4 inline-block text-sm font-semibold underline">
+              <Link
+                to="/shop"
+                search={{}}
+                className="mt-4 inline-block text-sm font-semibold underline"
+              >
                 Clear filters
               </Link>
             </div>
@@ -140,7 +163,11 @@ function SortSelect() {
   );
 }
 
-function FiltersPanel({ meta }: { meta?: { categories: { slug: string; name: string }[]; brands: { slug: string; name: string }[] } }) {
+function FiltersPanel({
+  meta,
+}: {
+  meta?: { categories: { slug: string; name: string }[]; brands: { slug: string; name: string }[] };
+}) {
   const sp = Route.useSearch();
   const nav = Route.useNavigate();
 
@@ -168,19 +195,41 @@ function FiltersPanel({ meta }: { meta?: { categories: { slug: string; name: str
           { v: "refurbished_b", l: "Grade B" },
           { v: "open_box", l: "Open Box" },
         ].map((o) => (
-          <FilterOption key={o.l} active={sp.condition === o.v} onClick={() => set("condition", o.v)}>{o.l}</FilterOption>
+          <FilterOption
+            key={o.l}
+            active={sp.condition === o.v}
+            onClick={() => set("condition", o.v)}
+          >
+            {o.l}
+          </FilterOption>
         ))}
       </FilterGroup>
       <FilterGroup title="Category">
-        <FilterOption active={!sp.category} onClick={() => set("category", undefined)}>All</FilterOption>
+        <FilterOption active={!sp.category} onClick={() => set("category", undefined)}>
+          All
+        </FilterOption>
         {meta?.categories.map((c) => (
-          <FilterOption key={c.slug} active={sp.category === c.slug} onClick={() => set("category", c.slug)}>{c.name}</FilterOption>
+          <FilterOption
+            key={c.slug}
+            active={sp.category === c.slug}
+            onClick={() => set("category", c.slug)}
+          >
+            {c.name}
+          </FilterOption>
         ))}
       </FilterGroup>
       <FilterGroup title="Brand">
-        <FilterOption active={!sp.brand} onClick={() => set("brand", undefined)}>All</FilterOption>
+        <FilterOption active={!sp.brand} onClick={() => set("brand", undefined)}>
+          All
+        </FilterOption>
         {meta?.brands.map((b) => (
-          <FilterOption key={b.slug} active={sp.brand === b.slug} onClick={() => set("brand", b.slug)}>{b.name}</FilterOption>
+          <FilterOption
+            key={b.slug}
+            active={sp.brand === b.slug}
+            onClick={() => set("brand", b.slug)}
+          >
+            {b.name}
+          </FilterOption>
         ))}
       </FilterGroup>
     </div>
@@ -190,12 +239,22 @@ function FiltersPanel({ meta }: { meta?: { categories: { slug: string; name: str
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </h3>
       <div className="flex flex-col gap-0.5">{children}</div>
     </div>
   );
 }
-function FilterOption({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function FilterOption({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}

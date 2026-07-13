@@ -18,7 +18,10 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof SubmitInput>) => SubmitInput.parse(d))
   .handler(async ({ data, context }) => {
     const { data: order, error: oerr } = await context.supabase
-      .from("orders").select("id, invoice_number, customer_email, customer_name, user_id").eq("id", data.order_id).maybeSingle();
+      .from("orders")
+      .select("id, invoice_number, customer_email, customer_name, user_id")
+      .eq("id", data.order_id)
+      .maybeSingle();
     if (oerr) throw new Error(oerr.message);
     if (!order) throw new Error("Order not found");
 
@@ -41,7 +44,10 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
 
-    await context.supabase.from("orders").update({ payment_status: "awaiting_verification" }).eq("id", data.order_id);
+    await context.supabase
+      .from("orders")
+      .update({ payment_status: "awaiting_verification" })
+      .eq("id", data.order_id);
 
     await notifyBoth(context.supabase, {
       customerEmail: order.customer_email,
@@ -62,7 +68,9 @@ export const getProofSignedUrl = createServerFn({ method: "POST" })
   .inputValidator((d: { path: string }) => z.object({ path: z.string().min(1) }).parse(d))
   .handler(async ({ data, context }) => {
     // RLS on storage.objects enforces ownership/admin access.
-    const { data: signed, error } = await context.supabase.storage.from("payment-proofs").createSignedUrl(data.path, 60 * 10);
+    const { data: signed, error } = await context.supabase.storage
+      .from("payment-proofs")
+      .createSignedUrl(data.path, 60 * 10);
     if (error) throw new Error(error.message);
     return { url: signed.signedUrl };
   });
@@ -75,7 +83,9 @@ export const adminListPayments = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("payments")
-      .select("*, order:orders(id, invoice_number, customer_name, customer_email, total, payment_status)")
+      .select(
+        "*, order:orders(id, invoice_number, customer_name, customer_email, total, payment_status)",
+      )
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
@@ -94,48 +104,71 @@ export const adminReviewPayment = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data: pay, error } = await context.supabase
-      .from("payments").select("id, order_id").eq("id", data.id).single();
+      .from("payments")
+      .select("id, order_id")
+      .eq("id", data.id)
+      .single();
     if (error) throw new Error(error.message);
 
     const status = data.action === "approve" ? "approved" : "rejected";
-    await context.supabase.from("payments").update({
-      status,
-      admin_notes: data.notes,
-      reviewed_by: context.userId,
-      reviewed_at: new Date().toISOString(),
-    }).eq("id", data.id);
+    await context.supabase
+      .from("payments")
+      .update({
+        status,
+        admin_notes: data.notes,
+        reviewed_by: context.userId,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", data.id);
 
     const { data: order } = await context.supabase
-      .from("orders").select("id, customer_email, customer_name, invoice_number, user_id, status").eq("id", pay.order_id).single();
+      .from("orders")
+      .select("id, customer_email, customer_name, invoice_number, user_id, status")
+      .eq("id", pay.order_id)
+      .single();
 
     if (data.action === "approve" && order) {
       const nextStatus = order.status === "pending" ? "paid" : order.status;
-      await context.supabase.from("orders").update({ payment_status: "paid", status: nextStatus }).eq("id", pay.order_id);
+      await context.supabase
+        .from("orders")
+        .update({ payment_status: "paid", status: nextStatus })
+        .eq("id", pay.order_id);
       await notifyBoth(context.supabase, {
-        customerEmail: order.customer_email, customerUserId: order.user_id,
+        customerEmail: order.customer_email,
+        customerUserId: order.user_id,
         kind: "payment-approved",
         adminSubject: `Payment approved for ${order.invoice_number}`,
         adminBody: `Approved by admin. Notes: ${data.notes || "—"}`,
         customerSubject: `Payment confirmed for ${order.invoice_number}`,
         customerBody: `Hi ${order.customer_name},\n\nGreat news — your payment for ${order.invoice_number} has been verified. We're preparing your order.\n\nFavour Computer Services`,
-        relatedType: "order", relatedId: pay.order_id,
+        relatedType: "order",
+        relatedId: pay.order_id,
       });
     } else if (order) {
-      await context.supabase.from("orders").update({ payment_status: "unpaid" }).eq("id", pay.order_id);
+      await context.supabase
+        .from("orders")
+        .update({ payment_status: "unpaid" })
+        .eq("id", pay.order_id);
       await notifyBoth(context.supabase, {
-        customerEmail: order.customer_email, customerUserId: order.user_id,
+        customerEmail: order.customer_email,
+        customerUserId: order.user_id,
         kind: "payment-rejected",
         adminSubject: `Payment rejected for ${order.invoice_number}`,
         adminBody: `Rejected by admin. Notes: ${data.notes || "—"}`,
         customerSubject: `Payment proof rejected for ${order.invoice_number}`,
         customerBody: `Hi ${order.customer_name},\n\nWe were unable to verify your payment proof for ${order.invoice_number}.\nReason: ${data.notes || "Please double-check the screenshot and try again."}\n\nFavour Computer Services`,
-        relatedType: "order", relatedId: pay.order_id,
+        relatedType: "order",
+        relatedId: pay.order_id,
       });
     }
 
     await logAudit(context.supabase, {
-      adminId: context.userId, adminEmail: context.claims?.email ?? "",
-      action: data.action, entity: "payment", entityId: data.id, details: { notes: data.notes },
+      adminId: context.userId,
+      adminEmail: context.claims?.email ?? "",
+      action: data.action,
+      entity: "payment",
+      entityId: data.id,
+      details: { notes: data.notes },
     });
     return { ok: true };
   });

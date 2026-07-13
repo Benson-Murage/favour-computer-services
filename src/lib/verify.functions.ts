@@ -26,7 +26,18 @@ export const lookupProductSpecs = createServerFn({ method: "GET" })
     z.object({ ids: z.array(z.string().uuid()).max(50) }).parse(d),
   )
   .handler(async ({ data }) => {
-    if (!data.ids.length) return { products: [] as Array<{ id: string; name: string; processor: string; ram: string; storage: string; warranty: string; condition: string }> };
+    if (!data.ids.length)
+      return {
+        products: [] as Array<{
+          id: string;
+          name: string;
+          processor: string;
+          ram: string;
+          storage: string;
+          warranty: string;
+          condition: string;
+        }>,
+      };
     const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_PUBLISHABLE_KEY!,

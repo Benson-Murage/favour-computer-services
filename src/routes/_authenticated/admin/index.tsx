@@ -14,9 +14,9 @@ function Dashboard() {
   const lq = useServerFn(listQuotes);
   const lb = useServerFn(listBookings);
 
-  const products = useQuery({ queryKey: ["adm","products"], queryFn: () => lp({}) });
-  const quotes = useQuery({ queryKey: ["adm","quotes"], queryFn: () => lq({}) });
-  const bookings = useQuery({ queryKey: ["adm","bookings"], queryFn: () => lb({}) });
+  const products = useQuery({ queryKey: ["adm", "products"], queryFn: () => lp({}) });
+  const quotes = useQuery({ queryKey: ["adm", "quotes"], queryFn: () => lq({}) });
+  const bookings = useQuery({ queryKey: ["adm", "bookings"], queryFn: () => lb({}) });
 
   const prods = products.data ?? [];
   const qs = quotes.data ?? [];
@@ -43,13 +43,21 @@ function Dashboard() {
             {qs.slice(0, 6).map((q) => (
               <li key={q.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                 <div>
-                  <div className="font-semibold">{q.name} <span className="text-xs text-muted-foreground">· {q.source}</span></div>
-                  <div className="text-xs text-muted-foreground">{q.email} · {q.phone}</div>
+                  <div className="font-semibold">
+                    {q.name} <span className="text-xs text-muted-foreground">· {q.source}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {q.email} · {q.phone}
+                  </div>
                 </div>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase">{q.status}</span>
+                <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase">
+                  {q.status}
+                </span>
               </li>
             ))}
-            {qs.length === 0 && <li className="py-2 text-sm text-muted-foreground">No quotes yet.</li>}
+            {qs.length === 0 && (
+              <li className="py-2 text-sm text-muted-foreground">No quotes yet.</li>
+            )}
           </ul>
         </Panel>
         <Panel title="Latest bookings">
@@ -57,13 +65,24 @@ function Dashboard() {
             {bs.slice(0, 6).map((b) => (
               <li key={b.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                 <div>
-                  <div className="font-semibold">{b.name} <span className="text-xs text-muted-foreground">· {b.event_type || "Event"}</span></div>
-                  <div className="text-xs text-muted-foreground">{b.event_date ?? "TBD"} · {b.event_location}</div>
+                  <div className="font-semibold">
+                    {b.name}{" "}
+                    <span className="text-xs text-muted-foreground">
+                      · {b.event_type || "Event"}
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {b.event_date ?? "TBD"} · {b.event_location}
+                  </div>
                 </div>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase">{b.status}</span>
+                <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase">
+                  {b.status}
+                </span>
               </li>
             ))}
-            {bs.length === 0 && <li className="py-2 text-sm text-muted-foreground">No bookings yet.</li>}
+            {bs.length === 0 && (
+              <li className="py-2 text-sm text-muted-foreground">No bookings yet.</li>
+            )}
           </ul>
         </Panel>
       </div>
@@ -71,11 +90,17 @@ function Dashboard() {
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: number; tone?: "ok"|"warn" }) {
+function Stat({ label, value, tone }: { label: string; value: number; tone?: "ok" | "warn" }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`mt-1 text-2xl font-bold ${tone==="warn" ? "text-[color:var(--destructive)]" : ""}`}>{value}</div>
+      <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      <div
+        className={`mt-1 text-2xl font-bold ${tone === "warn" ? "text-[color:var(--destructive)]" : ""}`}
+      >
+        {value}
+      </div>
     </div>
   );
 }

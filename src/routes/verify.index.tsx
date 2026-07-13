@@ -8,7 +8,10 @@ export const Route = createFileRoute("/verify/")({
   head: () => ({
     meta: [
       { title: "Verify Receipt — Favour Computer Services" },
-      { name: "description", content: "Enter your receipt verification code to confirm it is authentic." },
+      {
+        name: "description",
+        content: "Enter your receipt verification code to confirm it is authentic.",
+      },
     ],
   }),
   component: VerifyIndex,
@@ -33,8 +36,16 @@ function VerifyIndex() {
             if (c) nav({ to: "/verify/receipt/$code", params: { code: c } });
           }}
         >
-          <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="FCS-2026-XXXXXX" className="text-center font-mono uppercase tracking-widest" />
-          <Btn type="submit" className="mt-3 w-full justify-center"><Search className="mr-1 h-3.5 w-3.5" />Verify Receipt</Btn>
+          <Input
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="FCS-2026-XXXXXX"
+            className="text-center font-mono uppercase tracking-widest"
+          />
+          <Btn type="submit" className="mt-3 w-full justify-center">
+            <Search className="mr-1 h-3.5 w-3.5" />
+            Verify Receipt
+          </Btn>
         </form>
       </div>
     </div>
