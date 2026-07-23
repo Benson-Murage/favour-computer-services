@@ -24,7 +24,7 @@ function adminClient() {
 }
 
 export const submitQuote = createServerFn({ method: "POST" })
-  .inputValidator((data: QuoteInputType) => QuoteInput.parse(data))
+  .validator((data: QuoteInputType) => QuoteInput.parse(data))
   .handler(async ({ data }) => {
     const supabase = adminClient();
     const { data: row, error } = await supabase
@@ -65,7 +65,7 @@ export const submitQuote = createServerFn({ method: "POST" })
         adminSubject: `New ${data.source} quote request from ${data.name}`,
         adminBody: `Name: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nPackage: ${data.package || "—"}\nLocation: ${data.location || "—"}\nService: ${data.service_type || "—"}\n\nMessage:\n${data.message || "—"}`,
         customerSubject: `We received your request — Favour Computer Services`,
-        customerBody: `Hi ${data.name},\n\nThanks for reaching out. Our team has received your ${data.source} inquiry and will get back to you shortly with a tailored quote.\n\nFavour Computer Services\n0726 548 592`,
+        customerBody: `Hi ${data.name},\n\nWe got your ${data.source} request. We'll review the details and contact you directly with pricing and options.\n\nFavour Computer Services\n0726 548 592`,
         relatedType: "quote",
         relatedId: row.id,
       });
@@ -85,7 +85,7 @@ const BookingInput = z.object({
 });
 
 export const submitBooking = createServerFn({ method: "POST" })
-  .inputValidator((data: z.infer<typeof BookingInput>) => BookingInput.parse(data))
+  .validator((data: z.infer<typeof BookingInput>) => BookingInput.parse(data))
   .handler(async ({ data }) => {
     const supabase = adminClient();
     const { data: row, error } = await supabase
@@ -156,7 +156,7 @@ const UpdateQuote = z.object({
 
 export const updateQuote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: z.infer<typeof UpdateQuote>) => UpdateQuote.parse(data))
+  .validator((data: z.infer<typeof UpdateQuote>) => UpdateQuote.parse(data))
   .handler(async ({ data, context }) => {
     const { assertAdmin, logAudit } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);
@@ -182,7 +182,7 @@ const UpdateBooking = z.object({
 
 export const updateBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: z.infer<typeof UpdateBooking>) => UpdateBooking.parse(data))
+  .validator((data: z.infer<typeof UpdateBooking>) => UpdateBooking.parse(data))
   .handler(async ({ data, context }) => {
     const { assertAdmin, logAudit } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);

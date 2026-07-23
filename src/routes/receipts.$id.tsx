@@ -23,7 +23,7 @@ import { downloadReceiptPdf, printReceiptPdf, type ReceiptOrder } from "@/lib/re
 import { formatPrice } from "@/lib/format";
 import { useAuth } from "@/lib/auth";
 import { Btn } from "@/components/admin/ui";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import logoAsset from "@/assets/fcs-logo.png";
 
 export const Route = createFileRoute("/receipts/$id")({
   head: () => ({ meta: [{ title: "Receipt — Favour Computer Services" }] }),
@@ -290,7 +290,7 @@ function ReceiptPreview() {
         <div className="border-b border-border bg-gradient-to-br from-secondary/60 to-transparent p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="flex items-center gap-4">
-              <img src={logoAsset.url} alt="FCS" className="h-16 w-16 object-contain" />
+              <img src={logoAsset} alt="FCS" className="h-16 w-16 object-contain" />
               <div>
                 <div className="text-lg font-bold tracking-tight">{biz.name}</div>
                 <div className="text-xs text-muted-foreground">{biz.address}</div>

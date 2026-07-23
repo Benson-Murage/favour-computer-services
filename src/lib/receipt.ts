@@ -1,12 +1,12 @@
 import jsPDF from "jspdf";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import logoAsset from "@/assets/fcs-logo.png";
 
 let LOGO_DATA_URL: string | null = null;
 let LOGO_DIMS: { w: number; h: number } | null = null;
 async function loadLogo() {
   if (LOGO_DATA_URL) return { url: LOGO_DATA_URL, dims: LOGO_DIMS! };
   try {
-    const res = await fetch(logoAsset.url);
+    const res = await fetch(logoAsset);
     const blob = await res.blob();
     const dataUrl: string = await new Promise((resolve, reject) => {
       const r = new FileReader();

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { useBusinessSettings } from "@/lib/use-business-settings";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import logoImage from "@/assets/fcs-logo.png";
 
 export function SiteFooter() {
   const s = useBusinessSettings();
@@ -20,7 +20,7 @@ export function SiteFooter() {
   const desc =
     s?.business_description ||
     s?.tagline ||
-    "Your trusted technology partner in Nairobi — computers, CCTV installation, and live streaming services.";
+    "Favour Computer Services — computers, CCTV installation, and live streaming in Nairobi.";
   const address = s?.address || "F&F Building, Shop U13\nNext to Odeon Cinema, Nairobi";
   const phone = s?.phone || "0726 548 592";
   const email = s?.email || "bensonmurage254@gmail.com";
@@ -41,7 +41,7 @@ export function SiteFooter() {
         <div>
           <Link to="/" className="inline-flex items-center gap-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-background p-1.5">
-              <img src={logoAsset.url} alt={name} className="h-full w-full object-contain" />
+              <img src={logoImage} alt={name} className="h-full w-full object-contain" />
             </span>
             <span className="text-lg font-bold tracking-tight">{name}</span>
           </Link>

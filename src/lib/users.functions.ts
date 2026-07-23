@@ -61,7 +61,7 @@ export const listUsers = createServerFn({ method: "GET" })
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { user_id: string; role: AppRole }) =>
+  .validator((d: { user_id: string; role: AppRole }) =>
     z.object({ user_id: z.string().uuid(), role: z.enum(ROLE_VALUES) }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -91,7 +91,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const setUserDisabled = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { user_id: string; disabled: boolean }) =>
+  .validator((d: { user_id: string; disabled: boolean }) =>
     z.object({ user_id: z.string().uuid(), disabled: z.boolean() }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -116,7 +116,7 @@ export const setUserDisabled = createServerFn({ method: "POST" })
 
 export const sendPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { email: string; redirect_to?: string }) => d)
+  .validator((d: { email: string; redirect_to?: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -146,7 +146,7 @@ export const sendPasswordReset = createServerFn({ method: "POST" })
 
 export const forceSignOut = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { user_id: string }) => d)
+  .validator((d: { user_id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

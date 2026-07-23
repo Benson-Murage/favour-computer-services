@@ -19,7 +19,7 @@ function admin() {
 }
 
 export const subscribeNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((d: z.infer<typeof SubInput>) => SubInput.parse(d))
+  .validator((d: z.infer<typeof SubInput>) => SubInput.parse(d))
   .handler(async ({ data }) => {
     const supabase = admin();
     const { error } = await supabase
@@ -60,7 +60,7 @@ export const adminListSubscribers = createServerFn({ method: "GET" })
 
 export const adminDeleteSubscriber = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase

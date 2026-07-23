@@ -47,6 +47,7 @@ type SettingsUpdate = Partial<{
   hero_cta_primary_url: string;
   hero_cta_secondary_label: string;
   hero_cta_secondary_url: string;
+  hero_image_url: string;
   about_story: string;
   about_mission: string;
   about_vision: string;
@@ -63,7 +64,7 @@ type SettingsUpdate = Partial<{
 
 export const updateBusinessSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: SettingsUpdate) => input)
+  .validator((input: SettingsUpdate) => input)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data: row, error: rerr } = await context.supabase
@@ -75,7 +76,7 @@ export const updateBusinessSettings = createServerFn({ method: "POST" })
     if (!row) throw new Error("Settings row missing");
     const { error } = await context.supabase
       .from("business_settings")
-      .update(data)
+      .update(data as never)
       .eq("id", row.id);
     if (error) throw new Error(error.message);
     await logAudit(context.supabase, {

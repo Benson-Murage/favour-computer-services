@@ -6,7 +6,7 @@ import { verifyReceipt } from "@/lib/verify.functions";
 import { useBusinessSettings } from "@/lib/use-business-settings";
 import { formatPrice } from "@/lib/format";
 import { Btn, Input } from "@/components/admin/ui";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import logoAsset from "@/assets/fcs-logo.png";
 
 export const Route = createFileRoute("/verify/receipt/$code")({
   head: () => ({
@@ -91,7 +91,7 @@ function VerifyPage() {
       <div className="overflow-hidden rounded-3xl border border-border bg-card [box-shadow:var(--shadow-elevated)] print:rounded-none print:border-0 print:shadow-none">
         <div className="border-b border-border bg-gradient-to-br from-secondary/60 to-transparent p-6">
           <div className="flex items-center gap-4">
-            <img src={logoAsset.url} alt={biz.name} className="h-14 w-14 object-contain" />
+            <img src={logoAsset} alt={biz.name} className="h-14 w-14 object-contain" />
             <div>
               <div className="text-lg font-bold tracking-tight">{biz.name}</div>
               <div className="text-xs text-muted-foreground">Receipt Verification</div>

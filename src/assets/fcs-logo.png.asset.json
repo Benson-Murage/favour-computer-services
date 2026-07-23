@@ -1,11 +1,9 @@
 {
   "version": 1,
-  "asset_id": "1b803d4b-1835-48aa-9d5e-55b4cd2c7b51",
-  "project_id": "bcb2bc46-96c9-483f-bb89-ce1696c4b248",
-  "url": "/__l5e/assets-v1/1b803d4b-1835-48aa-9d5e-55b4cd2c7b51/fcs-logo.png",
-  "r2_key": "a/v1/bcb2bc46-96c9-483f-bb89-ce1696c4b248/1b803d4b-1835-48aa-9d5e-55b4cd2c7b51/fcs-logo.png",
+  "asset_id": "local",
+  "url": "/fcs-logo.png",
   "original_filename": "fcs-logo.png",
-  "size": 1463030,
+  "size": 0,
   "content_type": "image/png",
-  "created_at": "2026-07-01T07:37:02Z"
+  "created_at": "2026-07-23T00:00:00Z"
 }

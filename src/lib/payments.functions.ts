@@ -15,7 +15,7 @@ const SubmitInput = z.object({
 
 export const submitPaymentProof = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof SubmitInput>) => SubmitInput.parse(d))
+  .validator((d: z.infer<typeof SubmitInput>) => SubmitInput.parse(d))
   .handler(async ({ data, context }) => {
     const { data: order, error: oerr } = await context.supabase
       .from("orders")
@@ -65,7 +65,7 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
 
 export const getProofSignedUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { path: string }) => z.object({ path: z.string().min(1) }).parse(d))
+  .validator((d: { path: string }) => z.object({ path: z.string().min(1) }).parse(d))
   .handler(async ({ data, context }) => {
     // RLS on storage.objects enforces ownership/admin access.
     const { data: signed, error } = await context.supabase.storage
@@ -100,7 +100,7 @@ const ReviewInput = z.object({
 
 export const adminReviewPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof ReviewInput>) => ReviewInput.parse(d))
+  .validator((d: z.infer<typeof ReviewInput>) => ReviewInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data: pay, error } = await context.supabase

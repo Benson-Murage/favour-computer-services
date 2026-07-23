@@ -119,9 +119,9 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
         <div className="absolute inset-0 -z-10 opacity-30 [background-image:radial-gradient(circle_at_20%_30%,white,transparent_40%),radial-gradient(circle_at_80%_70%,white,transparent_45%)]" />
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 text-background md:grid-cols-2 md:py-28">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 text-background md:grid-cols-2 md:py-28 dark:text-foreground">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-background/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-full bg-background/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur dark:bg-foreground/10">
               <Sparkles className="h-3.5 w-3.5" /> Trusted in Nairobi since day one
             </span>
             {heroTitle ? (
@@ -135,20 +135,20 @@ function Home() {
                 Partner in <span className="text-[color:var(--accent)]">Nairobi.</span>
               </h1>
             )}
-            <p className="mt-5 max-w-lg text-base text-background/75 md:text-lg">
+            <p className="mt-5 max-w-lg text-base text-background/75 md:text-lg dark:text-foreground/75">
               {heroSubtitle ||
                 "Premium laptops, computers, CCTV solutions, live streaming services and genuine tech accessories — new and refurbished. Order online or pick up at our shop."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href={ctaPrimary.url}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground transition hover:scale-[1.02]"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground transition hover:scale-[1.02] dark:bg-foreground dark:text-background"
               >
                 {ctaPrimary.label} <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href={ctaSecondary.url}
-                className="inline-flex h-12 items-center gap-2 rounded-full border border-background/30 bg-background/5 px-6 text-sm font-semibold text-background backdrop-blur transition hover:bg-background/15"
+                className="inline-flex h-12 items-center gap-2 rounded-full border border-background/30 bg-background/5 px-6 text-sm font-semibold text-background backdrop-blur transition hover:bg-background/15 dark:border-foreground/30 dark:bg-foreground/5 dark:text-foreground dark:hover:bg-foreground/15"
               >
                 {ctaSecondary.label}
               </a>
@@ -161,26 +161,36 @@ function Home() {
           </div>
           <div className="relative hidden md:block">
             <div className="absolute -right-10 top-10 h-72 w-72 rounded-full bg-[color:var(--accent)]/30 blur-3xl" />
-            <div className="relative grid grid-cols-2 gap-4">
-              {data.featured.slice(0, 4).map((p, i) => (
-                <div
-                  key={p.id}
-                  className={`overflow-hidden rounded-3xl bg-background/95 p-4 shadow-2xl backdrop-blur ${i % 2 ? "translate-y-6" : ""}`}
-                >
-                  <div className="aspect-square overflow-hidden rounded-2xl bg-secondary">
-                    {p.image_url && (
-                      <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />
-                    )}
+            {settings?.hero_image_url ? (
+              <img
+                src={settings.hero_image_url}
+                alt={heroTitle || "Favour Computer Services"}
+                className="relative w-full rounded-3xl border border-background/20 object-cover shadow-2xl backdrop-blur dark:border-foreground/15"
+              />
+            ) : (
+              <div className="relative grid grid-cols-2 gap-4">
+                {data.featured.slice(0, 4).map((p, i) => (
+                  <div
+                    key={p.id}
+                    className={`overflow-hidden rounded-3xl bg-background/95 p-4 shadow-2xl backdrop-blur dark:bg-foreground/10 dark:text-background ${i % 2 ? "translate-y-6" : ""}`}
+                  >
+                    <div className="aspect-square overflow-hidden rounded-2xl bg-secondary">
+                      {p.image_url && (
+                        <img
+                          src={p.image_url}
+                          alt={p.name}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <p className="mt-3 line-clamp-1 text-xs font-semibold">{p.name}</p>
+                    <p className="text-xs text-muted-foreground dark:text-foreground/70">
+                      ${Number(p.price).toLocaleString()}
+                    </p>
                   </div>
-                  <p className="mt-3 line-clamp-1 text-xs font-semibold text-foreground">
-                    {p.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    ${Number(p.price).toLocaleString()}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -533,7 +543,9 @@ function Stat({ n, l }: { n: string; l: string }) {
   return (
     <div>
       <div className="text-2xl font-bold">{n}</div>
-      <div className="text-xs uppercase tracking-wider text-background/60">{l}</div>
+      <div className="text-xs uppercase tracking-wider text-background/60 dark:text-foreground/60">
+        {l}
+      </div>
     </div>
   );
 }

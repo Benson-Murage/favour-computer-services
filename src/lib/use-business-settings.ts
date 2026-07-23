@@ -30,6 +30,7 @@ export type BusinessSettings = {
   hero_cta_primary_url: string | null;
   hero_cta_secondary_label: string | null;
   hero_cta_secondary_url: string | null;
+  hero_image_url: string | null;
   about_story: string | null;
   about_mission: string | null;
   about_vision: string | null;

@@ -32,7 +32,7 @@ function gen(prefix: string, n: number) {
 }
 
 export const placeOrder = createServerFn({ method: "POST" })
-  .inputValidator((data: z.infer<typeof OrderInput>) => OrderInput.parse(data))
+  .validator((data: z.infer<typeof OrderInput>) => OrderInput.parse(data))
   .handler(async ({ data }) => {
     const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
@@ -138,7 +138,7 @@ export const listMyOrders = createServerFn({ method: "GET" })
 
 export const getMyOrder = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: order, error } = await context.supabase
       .from("orders")
@@ -171,7 +171,7 @@ const UpdateOrderInput = z.object({
 
 export const adminUpdateOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof UpdateOrderInput>) => UpdateOrderInput.parse(d))
+  .validator((d: z.infer<typeof UpdateOrderInput>) => UpdateOrderInput.parse(d))
   .handler(async ({ data, context }) => {
     const { assertAdmin, logAudit } = await import("./admin/audit.server");
     await assertAdmin(context.supabase, context.userId);

@@ -22,7 +22,7 @@ export default defineConfig({
       filename: "sw.js",
       strategies: "generateSW",
       devOptions: { enabled: false },
-      includeAssets: ["favicon.png", "apple-touch-icon.png", "icons/*.png"],
+      includeAssets: ["favicon.png", "apple-touch-icon.png", "fcs-logo.png", "icons/*.png"],
       manifest: {
         name: "Favour Computer Services",
         short_name: "FCS",

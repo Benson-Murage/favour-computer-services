@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import logoAsset from "@/assets/fcs-logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 type NavEntry = { to: string; label: string; Icon: typeof LayoutDashboard; exact?: boolean };
@@ -51,7 +51,7 @@ export function AdminShell({ title, children }: { title: string; children: React
     <div className="mx-auto grid max-w-[1400px] gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
       <aside className="h-fit rounded-2xl border border-border bg-card p-3 lg:sticky lg:top-24">
         <div className="flex items-center gap-2.5 px-3 pb-3 pt-1">
-          <img src={logoAsset.url} alt="FCS" className="h-9 w-9 object-contain" />
+          <img src={logoAsset} alt="FCS" className="h-9 w-9 object-contain" />
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
               Admin

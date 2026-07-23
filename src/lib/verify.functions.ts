@@ -4,9 +4,7 @@ import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 
 export const verifyReceipt = createServerFn({ method: "GET" })
-  .inputValidator((d: { code: string }) =>
-    z.object({ code: z.string().trim().min(4).max(64) }).parse(d),
-  )
+  .validator((d: { code: string }) => z.object({ code: z.string().trim().min(4).max(64) }).parse(d))
   .handler(async ({ data }) => {
     const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
@@ -22,7 +20,7 @@ export const verifyReceipt = createServerFn({ method: "GET" })
   });
 
 export const lookupProductSpecs = createServerFn({ method: "GET" })
-  .inputValidator((d: { ids: string[] }) =>
+  .validator((d: { ids: string[] }) =>
     z.object({ ids: z.array(z.string().uuid()).max(50) }).parse(d),
   )
   .handler(async ({ data }) => {

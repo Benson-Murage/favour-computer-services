@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 export const getPublicServicePackages = createServerFn({ method: "GET" })
-  .inputValidator((kind: "cctv" | "livestream") => kind)
+  .validator((kind: "cctv" | "livestream") => kind)
   .handler(async ({ data }) => {
     const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,

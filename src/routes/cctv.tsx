@@ -157,9 +157,7 @@ function CctvPage() {
 
       <section className="mx-auto max-w-3xl px-4 py-16 text-center">
         <h2 className="text-2xl font-bold">Ready to get started?</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Request a tailored CCTV quote — no obligation.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Request a CCTV quote — no obligation.</p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => setQuote({ pkg: "" })}

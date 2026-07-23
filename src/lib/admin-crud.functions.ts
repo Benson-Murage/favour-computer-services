@@ -48,7 +48,7 @@ const ProductInput = z.object({
 
 export const saveProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: z.infer<typeof ProductInput>) => ProductInput.parse(data))
+  .validator((data: z.infer<typeof ProductInput>) => ProductInput.parse(data))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const payload: Record<string, unknown> = { ...data };
@@ -82,7 +82,7 @@ export const saveProduct = createServerFn({ method: "POST" })
 
 export const setProductArchived = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; archived: boolean }) => d)
+  .validator((d: { id: string; archived: boolean }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase
@@ -102,7 +102,7 @@ export const setProductArchived = createServerFn({ method: "POST" })
 
 export const deleteProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.from("products").delete().eq("id", data.id);
@@ -142,7 +142,7 @@ export const listCategoriesAdmin = createServerFn({ method: "GET" })
 
 export const saveCategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof CategoryInput>) => CategoryInput.parse(d))
+  .validator((d: z.infer<typeof CategoryInput>) => CategoryInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     if (data.id) {
@@ -162,7 +162,7 @@ export const saveCategory = createServerFn({ method: "POST" })
 
 export const deleteCategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.from("categories").delete().eq("id", data.id);
@@ -195,7 +195,7 @@ export const listBrandsAdmin = createServerFn({ method: "GET" })
 
 export const saveBrand = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof BrandInput>) => BrandInput.parse(d))
+  .validator((d: z.infer<typeof BrandInput>) => BrandInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     if (data.id) {
@@ -215,7 +215,7 @@ export const saveBrand = createServerFn({ method: "POST" })
 
 export const deleteBrand = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.from("brands").delete().eq("id", data.id);
@@ -227,7 +227,7 @@ export const deleteBrand = createServerFn({ method: "POST" })
 
 export const adjustStock = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { product_id: string; delta: number; reason?: string }) => d)
+  .validator((d: { product_id: string; delta: number; reason?: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data: prod, error: e1 } = await context.supabase
@@ -304,7 +304,7 @@ export const listPackagesAdmin = createServerFn({ method: "GET" })
 
 export const savePackage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof PackageInput>) => PackageInput.parse(d))
+  .validator((d: z.infer<typeof PackageInput>) => PackageInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const payload = {
@@ -333,7 +333,7 @@ export const savePackage = createServerFn({ method: "POST" })
 
 export const deletePackage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.from("service_packages").delete().eq("id", data.id);
@@ -368,7 +368,7 @@ export const listPromotionsAdmin = createServerFn({ method: "GET" })
 
 export const savePromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof PromoInput>) => PromoInput.parse(d))
+  .validator((d: z.infer<typeof PromoInput>) => PromoInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     if (data.id) {
@@ -393,7 +393,7 @@ export const savePromotion = createServerFn({ method: "POST" })
 
 export const deletePromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.from("promotions").delete().eq("id", data.id);
@@ -418,7 +418,7 @@ export const listOrders = createServerFn({ method: "GET" })
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (d: {
       id: string;
       status: "pending" | "paid" | "ready" | "picked_up" | "delivered" | "cancelled";
@@ -444,7 +444,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
 
 export const adminGetOrder = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { data: order, error } = await context.supabase

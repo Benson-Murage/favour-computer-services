@@ -146,6 +146,7 @@ function SettingsPage() {
         "hero_cta_primary_url",
         "hero_cta_secondary_label",
         "hero_cta_secondary_url",
+        "hero_image_url",
         "about_story",
         "about_mission",
         "about_vision",
@@ -194,7 +195,7 @@ function SettingsPage() {
                 <Input
                   value={f("tagline")}
                   onChange={(e) => set("tagline", e.target.value)}
-                  placeholder="e.g. Your trusted technology partner"
+                  placeholder="e.g. Favour Computer Services — Nairobi"
                 />
               </Field>
             </div>
@@ -481,6 +482,11 @@ function SettingsPage() {
                   placeholder="/contact"
                 />
               </Field>
+              <ImageUploader
+                label="Homepage hero image"
+                value={f("hero_image_url")}
+                onChange={(v) => set("hero_image_url", v)}
+              />
             </div>
           </div>
         </Card>

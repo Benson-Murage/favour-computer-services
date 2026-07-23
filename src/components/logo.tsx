@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
+import logoSrc from "@/assets/fcs-logo.png";
 
 type Props = {
   className?: string;
@@ -25,7 +25,7 @@ export function Logo({
   const inner = (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <img
-        src={logoAsset.url}
+        src={logoSrc}
         alt="Favour Computer Services"
         className={`${SIZE[size]} w-auto shrink-0 object-contain ${imgClassName}`}
         width={512}
@@ -45,4 +45,4 @@ export function Logo({
   return <Link to={href}>{inner}</Link>;
 }
 
-export const LOGO_URL = logoAsset.url;
+export const LOGO_URL = logoSrc;

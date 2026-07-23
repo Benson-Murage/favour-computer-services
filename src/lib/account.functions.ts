@@ -19,7 +19,7 @@ export const getMyProfile = createServerFn({ method: "GET" })
 
 export const updateMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { full_name?: string; phone?: string }) =>
+  .validator((d: { full_name?: string; phone?: string }) =>
     z
       .object({ full_name: z.string().max(120).optional(), phone: z.string().max(40).optional() })
       .parse(d),
@@ -66,7 +66,7 @@ const AddressInput = z.object({
 
 export const upsertMyAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof AddressInput>) => AddressInput.parse(d))
+  .validator((d: z.infer<typeof AddressInput>) => AddressInput.parse(d))
   .handler(async ({ data, context }) => {
     const payload = { ...data, user_id: context.userId };
     if (data.is_default) {
@@ -90,7 +90,7 @@ export const upsertMyAddress = createServerFn({ method: "POST" })
 
 export const deleteMyAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("user_addresses")
@@ -103,7 +103,7 @@ export const deleteMyAddress = createServerFn({ method: "POST" })
 
 export const setDefaultAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await context.supabase
       .from("user_addresses")
@@ -120,7 +120,7 @@ export const setDefaultAddress = createServerFn({ method: "POST" })
 
 export const changeMyPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { new_password: string }) =>
+  .validator((d: { new_password: string }) =>
     z.object({ new_password: z.string().min(8).max(200) }).parse(d),
   )
   .handler(async ({ data, context }) => {

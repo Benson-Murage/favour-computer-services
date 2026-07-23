@@ -16,7 +16,6 @@ import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider, themeInitScript } from "@/lib/theme";
-import logoAsset from "@/assets/fcs-logo.png.asset.json";
 import { PWAManager } from "@/components/pwa/pwa-manager";
 
 function NotFoundComponent() {
@@ -107,8 +106,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Laptops, desktops, phones, CCTV installation and live streaming services in Nairobi. F&F Building Shop U13, next to Odeon Cinema.",
       },
-      { property: "og:image", content: logoAsset.url },
-      { name: "twitter:image", content: logoAsset.url },
+      { property: "og:image", content: "/fcs-logo.png" },
+      { name: "twitter:image", content: "/fcs-logo.png" },
       { name: "theme-color", content: "#0b1220" },
       { name: "application-name", content: "Favour Computer Services" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
