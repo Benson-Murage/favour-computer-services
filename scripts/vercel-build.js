@@ -14,3 +14,10 @@ for (const entry of entries) {
 }
 
 fs.rmSync(clientDir, { recursive: true });
+
+const apiSrc = path.join("api", "server.js");
+const apiDest = path.join(dist, "api", "server.js");
+if (fs.existsSync(apiSrc)) {
+  fs.mkdirSync(path.dirname(apiDest), { recursive: true });
+  fs.cpSync(apiSrc, apiDest);
+}
